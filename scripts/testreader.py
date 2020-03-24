@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 # This node reads the WASD keys, increments/decrements the speed/angle and publishes this to the topic "controls". It is used to manually drive the car.
-# This version filters away negatives speed.
 
 import rospy
 from beginner_tutorials.msg import car_control
@@ -50,8 +49,8 @@ getch = _Getch()
 if __name__ == '__main__':
   # initializes the node and sets up the publishing settings. what everything means can be found in the ros tutorials
   rospy.init_node('user_listener', anonymous=True)
-  pub = rospy.Publisher('controls', car_control, queue_size=1)
-  rate = rospy.Rate(10) # 10hz
+  pub = rospy.Publisher('controls', car_control, queue_size=5)
+  # rate = rospy.Rate(10) # 10hz
   # initializes the custom message and makes sure the starting values are 0
   msg = car_control()
   angle = 0

@@ -23,7 +23,7 @@ int main(int argc, char **argv){
 	ros::init(argc,argv,"control_listener");
 	ros::NodeHandle n;
 	// subscribes to the topic "controls" and calls the function callback_send when it receives a message.
-	ros::Subscriber sub = n.subscribe("controls", 1, callback_send);
+	ros::Subscriber sub = n.subscribe("controls", 5, callback_send);
 
 	ros::spin();
 }

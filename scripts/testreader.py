@@ -50,7 +50,7 @@ if __name__ == '__main__':
   # initializes the node and sets up the publishing settings. what everything means can be found in the ros tutorials
   rospy.init_node('user_listener', anonymous=True)
   pub = rospy.Publisher('controls', car_control, queue_size=5)
-  # rate = rospy.Rate(10) # 10hz
+  rate = rospy.Rate(60) # 10hz
   # initializes the custom message and makes sure the starting values are 0
   msg = car_control()
   angle = 0

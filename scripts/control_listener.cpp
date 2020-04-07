@@ -1,4 +1,4 @@
-// This program subscribes to "controls" and sends the message to CANComunications.cpp
+// This program subscribes to the "controls" msg and sends it to CANComunications.cpp
 
 #include "ros/ros.h"
 #include "CANComunication.h"
@@ -8,7 +8,9 @@
  
 CANComunication can;
 
-// steer is an angle between -40 and 40 where negative numbers turn the wheel to the left, Speed is in km/h (I think) and the maximum is 5km/h. uses the custom message car_control which is made of two int32 called speed and angle. 
+// steer is an angle between -40 and 40 where negative numbers turn the wheel to the left
+// Speed is in km/h with a span of -5 to 5 km/h. This uses the custom message car_control
+// which is made of two int32 called speed and angle. 
 void callback_send(const beginner_tutorials::car_control::ConstPtr& msg)
 {	
 	can.speed = msg->speed;

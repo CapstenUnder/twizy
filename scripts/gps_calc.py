@@ -15,22 +15,9 @@ def calcangle():
      global angle
      gps_x_diff = gps_h_x - gps_v_x
      gps_y_diff = gps_h_y - gps_v_y
-     print( gps_x_diff)
-     print( gps_y_diff)
-     if gps_x_diff == 0 and gps_y_diff == 0:
-        angle = 0
-     elif gps_x_diff == 0 and gps_y_diff > 0:
-        angle = np.pi/2
-     elif gps_x_diff == 0 and gps_y_diff < 0:
-        angle = -np.pi/2
-     elif gps_x_diff < 0 and gps_y_diff > 0:
-        angle = np.pi + np.arctan(gps_y_diff/gps_x_diff)
-     elif gps_x_diff > 0 and gps_y_diff > 0:
-        angle = np.arctan(gps_y_diff/gps_x_diff)
-     elif gps_x_diff > 0 and gps_y_diff < 0:
-        angle = np.arctan(gps_y_diff/gps_x_diff)
-     else: 
-        angle = -np.pi + np.arctan(gps_y_diff/gps_x_diff)
+     #print( gps_x_diff)
+     #print( gps_y_diff)
+     angle = np.arctan2(gps_y_diff, gps_x_diff) + np.pi/2
      
      
 

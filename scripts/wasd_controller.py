@@ -3,7 +3,7 @@
 # This node reads the WASD keys, increments/decrements the speed/angle and publishes this to the topic "controls". It is used to manually drive the car.
 
 import rospy
-from beginner_tutorials.msg import car_control
+from twizy.msg import car_control
 
 # A class for reading the keybard, i copied this from the internet and have no idea how it works.
 class _Getch:

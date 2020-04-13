@@ -12,3 +12,19 @@ To run with wasd
 1 Run roscore
 2 Run rosrun twizy control_node
 3 Run rosrun twizy testreader.py
+
+
+### För att ladda ner denna github till egen dator ###
+0 ~ cd catkin_ws
+1 ~ git clone https://github.com/CapstenUnder/twizy.git
+2 follow the guide for downloading Canlib to linux https://www.kvaser.com/canlib-webhelp/page_installing.html
+3 när du är i din catkin_ws/src ~ catkin_make 
+
+### För att slippa att skriva in "source ~/catkin_ws/devel/setup.bash" varenda jävla gång i ny terminal ###
+1 ~ nano ~/.bashrc
+2 skrolla lägst ner i dokumentet som kommer upp och lägg in raden "source ~/catkin_ws/devel/setup.bash"
+3 klicka på ctr + o
+4 klicka på enter
+5 klicka på crt + x
+
+### GLAD PÅSK ###

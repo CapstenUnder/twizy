@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs message_generation
 add_message_files(
 FILES
 car_control.msg
+path_generator.msg
 )
 
 ## Generate added messages and services
@@ -27,6 +28,7 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 add_executable(control_node
 scripts/control_listener.cpp
 scripts/CANComunication.cpp
+scripts/path_planner_wrapper.py
 )
 
 target_link_libraries(control_node

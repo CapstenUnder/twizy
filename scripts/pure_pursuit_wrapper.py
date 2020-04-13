@@ -1,7 +1,10 @@
 #!/usr/bin/env python
-from twizy.scripts.src import pure_pursuit
+
+
+import pure_pursuit
 import rospy
 from std_msgs.msg import Float32MultiArray
+from std_msgs.msg import String
 from twizy.msg import car_control
 from matplotlib import pyplot as plt
 import numpy as np
@@ -9,6 +12,20 @@ import math
 
 
 class Wrapper:
+    
+    # Generate an int array from a simple string
+    def string_to_int_arr(z_string):
+        z_int_arr = []
+        space_removed = z_string.replace(' ', '')
+        z_string_arr = space_removed.split(',')
+        for j in range(frame_height):
+            for i in range(frame_width):
+                #print("length of z_string_arr " + str(len(z_string_arr)))
+                #print("frame_width length " + str((j * frame_width + i) * 2 + 1))
+                z_int_arr.append(int(calculate_z(z_string_arr[(j * frame_width + i) * 2],
+                                         z_string_arr[(j * frame_width + i) * 2 + 1]) * forward_max))
+        return z_int_arr
+
 
     def __init__(self):
         self.counter = 0
@@ -30,7 +47,7 @@ class Wrapper:
         plt.pause(0.001)
 
     def GPS_callback(self, msg):
-
+	print('que')
         if self.path_is_ready and self.GPS != None:
             self.GPS = msg.data
 
@@ -64,12 +81,12 @@ class Wrapper:
                 pub.publish(msg_to_publish)
 
                 if lastIndex <= target_ind:
-                    self.ros_plot(state, states, target_ind)
+                    #self.ros_plot(state, states, target_ind)
                     rospy.on_shutdown(self.shutdown_hook())
 
     def path_callback(self, msg):  # fix callback when mapping is done
-
-        path.path_generated = 1  # msg.data[3]
+	print('que2')
+        #path.path_generated = msg_arr[3]  # msg.data[3]
         if path.is_path_generated() and self.counter < 1 and self.GPS != None:  # only execute once!
             a = 0.8960  # msg.data[0]
             b = 0.6765  # msg.data[1]
@@ -84,11 +101,11 @@ if __name__ == '__main__':
     pub = rospy.Publisher('controls', car_control, queue_size=5)
     msg_to_publish = car_control
     rate = rospy.Rate(1000)  # Adjust rate?
-
     path = pure_pursuit.TargetCourse()
+    wrap = Wrapper()
 
     while not rospy.is_shutdown():
-        rospy.Subscriber('GPS_pos', Float32MultiArray, Wrapper.GPS_callback)
-        rospy.Subscriber('path_planner', Float32MultiArray, Wrapper.path_callback)
+        rospy.Subscriber('GPS_pos', Float32MultiArray, wrap.GPS_callback)
+        rospy.Subscriber('path_planner', Float32MultiArray, wrap.path_callback)
 
         rate.sleep()

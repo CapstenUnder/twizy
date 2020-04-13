@@ -28,7 +28,6 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 add_executable(control_node
 scripts/control_listener.cpp
 scripts/CANComunication.cpp
-scripts/path_planner_wrapper.py
 )
 
 target_link_libraries(control_node

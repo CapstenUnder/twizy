@@ -27,16 +27,16 @@ class Wrapper:
             parking_map = path_planner.Map(start, p1, p2, end, distance, offset).generateMap()
 
             a, b, c = path_planner.path(current, goal, parking_map)
-            msg_to_publish.a = a
-            msg_to_publish.b = b
-            msg_to_publish.c = c
-            msg_to_publish.done = 1
+            msg_to_publish.data[0] = a
+            msg_to_publish.data[1] = b
+            msg_to_publish.data[2] = c
+            msg_to_publish.done[3] = 1
         else:
             print('Mapping not yet done!')
-            msg_to_publish.a = 0
-            msg_to_publish.b = 0
-            msg_to_publish.c = 0
-            msg_to_publish.done = 0
+            msg_to_publish.data[0] = 0
+            msg_to_publish.data[1] = 0
+            msg_to_publish.data[2] = 0
+            msg_to_publish.data[3] = 0
 
 
 if __name__ == '__main__':

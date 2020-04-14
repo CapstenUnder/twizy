@@ -69,7 +69,7 @@ class Wrapper:
             msg_to_publish.speed = target_speed
             print(angle,target_speed)
             pub.publish(msg_to_publish)
-            
+
             #if lastIndex <= target_ind:
 
             if self.GPS[0] > 7:             # Cancels at gps.x > 7 atm

@@ -8,7 +8,6 @@ find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs message_generation
 add_message_files(
 FILES
 car_control.msg
-path_generator.msg
 )
 
 ## Generate added messages and services

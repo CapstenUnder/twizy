@@ -1,9 +1,9 @@
 import numpy as np
 import math
 import matplotlib.pyplot as plt
-import tkinter
+#import tkinter
 import matplotlib
-matplotlib.use('TkAgg')
+#matplotlib.use('TkAgg')
 
 # Parameters
 k = 0.1    # look forward gain
@@ -17,7 +17,7 @@ show_animation = True
 
 class State:
 
-    def __init__(self, x, y, yaw, v):
+    def __init__(self, x=0, y=0, yaw=0, v=0):
         self.x = x
         self.y = y
         self.yaw = yaw
@@ -25,11 +25,11 @@ class State:
         self.rear_x = self.x - ((WB / 2) * math.cos(self.yaw))
         self.rear_y = self.y - ((WB / 2) * math.sin(self.yaw))
 
-    def update_from_gps(self, gps_data, a):
+    def update_from_gps(self, gps_data, v):
         self.x = gps_data[0]
         self.y = gps_data[1]
         self.yaw = gps_data[2]
-        self.v = a * dt
+        self.v = v
         self.rear_x = self.x - ((WB / 2) * math.cos(self.yaw))
         self.rear_y = self.y - ((WB / 2) * math.sin(self.yaw))
 

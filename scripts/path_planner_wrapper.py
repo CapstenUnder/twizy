@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
-from twizy.msg import path_generator
-from twizy.scripts.src import path_planner
+import path_planner
 import rospy
 from std_msgs.msg import Float32MultiArray
 
@@ -44,15 +43,12 @@ if __name__ == '__main__':
 
     rospy.init_node('PathPlanner')
     pub = rospy.Publisher('path_planner', Float32MultiArray, queue_size=5)
-    msg_to_publish = path_generator
-    rate = rospy.Rate(1000)  # Adjust rate?
+    msg_to_publish = Float32MultiArray()
+    rate = rospy.Rate(1)  # Adjust rate?
 
     while not rospy.is_shutdown():
         #rospy.Subscriber('mapping', Float32MultiArray, Wrapper.mapper_callback)
-	print('Mapping not yet done!')            
-	msg_to_publish.a = 0
-        msg_to_publish.b = 0
-        msg_to_publish.c = 0
-        msg_to_publish.done = 0
-
+        msg_to_publish.data = [0.8960, 0.6765,0.0, 1.0]
+        print(msg_to_publish.data[0], msg_to_publish.data[1], msg_to_publish.data[2], msg_to_publish.data[3])
+        pub.publish(msg_to_publish)
         rate.sleep()

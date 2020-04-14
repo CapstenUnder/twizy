@@ -84,7 +84,7 @@ class Wrapper:
             a =  msg.data[0] # 0.8960
             b =  msg.data[1] # 0.6765
             c =  msg.data[2] # 0
-            path.set_path(a, b, c, self.GPS[0], self.GPS[1])
+            path.set_path(a, b, c, self.GPS[0], self.GPS[1], self.GPS[2])
             self.counter += 1
             self.path_is_ready = True
 

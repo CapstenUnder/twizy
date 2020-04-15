@@ -13,18 +13,7 @@ import math
 
 class Wrapper:
     
-    # Generate an int array from a simple string
-    def string_to_int_arr(z_string):
-        z_int_arr = []
-        space_removed = z_string.replace(' ', '')
-        z_string_arr = space_removed.split(',')
-        for j in range(frame_height):
-            for i in range(frame_width):
-                #print("length of z_string_arr " + str(len(z_string_arr)))
-                #print("frame_width length " + str((j * frame_width + i) * 2 + 1))
-                z_int_arr.append(int(calculate_z(z_string_arr[(j * frame_width + i) * 2],
-                                         z_string_arr[(j * frame_width + i) * 2 + 1]) * forward_max))
-        return z_int_arr
+
 
 
     def __init__(self):

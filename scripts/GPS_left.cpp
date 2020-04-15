@@ -11,7 +11,8 @@
 #include <libsbp/navigation.h>
 #include <libsbp/orientation.h>
 #include <libsbp/system.h>
-#include "sstream"
+#include <sstream> 
+//CHANGED " " to < >
 #include <iostream>
 
 
@@ -23,7 +24,8 @@ static sbp_msg_callbacks_node_t pos_llh_node;
 static sbp_msg_callbacks_node_t baseline_heading_callback_node;
 int socket_desc = -1;
 float pos[2];
-std::string lon_lat;
+//std::string lon_lat;
+std_msgs::String lon_lat; //CHANGED
 
 struct piksi_msg {
   // GPS solution data
@@ -94,7 +96,9 @@ void pos_llh_callback(u16 sender_id, u8 len, u8 msg[], void *context)
     //pos[1] = (float)pos_llh.lat;
     ss << std::setprecision(std::numeric_limits<double>::digits10+1);
     ss << pos_llh.lon << "," << pos_llh.lat ;
-    lon_lat = ss.str();
+
+    lon_lat.data = ss.str(); // CHANGED HERE, added .data
+
     //if( strcmp(tcp_ip_addr,"192.168.0.222") == 0){
   //std::cout << "tid: "<<  ms.count() << " lat: " << pos_llh.lat << " lon: " << pos_llh.lon << std::endl; 
   printf("lat %.10f lon %.10f\n", pos_llh.lat ,pos_llh.lon );
@@ -130,7 +134,10 @@ s32 socket_read(u8 *buff, u32 n, void *context)
 int main(int argc, char **argv)
 {
 	std::cout << "main"<<std::endl;
-    ros::init(argc, argv,"GPS_left_talker");
+    //ros::init(argc, argv,"GPS_left_talker");
+    ros::init(argc, argv,"gps_left");
+// CHANGED ABOVE
+
     ros::NodeHandle n;
     ros::Publisher GPS_pub = n.advertise<std_msgs::String>("GPS_left", 2);
     ros::Rate loop_rate(1000000);

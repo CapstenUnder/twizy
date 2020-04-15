@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import pure_pursuit
 import rospy
-from std_msgs.msg import Float32MultiArray
+from std_msgs.msg import Float64MultiArray
 from twizy.msg import car_control
 from matplotlib import pyplot as plt
 import numpy as np
@@ -15,6 +15,11 @@ class Wrapper:
         self.path_is_ready = False
         self.GPS = None
         self.time = 0
+        self.offset = None
+        self.parking_length = None
+        self.GPS_init_xpos = None
+        self.init_counter = 0
+        self.backsensor_dist = None
 
     def shutdown_hook(self):
         print('Goal reached!')
@@ -37,14 +42,18 @@ class Wrapper:
         plt.grid(True)
         plt.show()
 
+
+
     def GPS_callback(self, msg):
+        if self.init_counter < 1:
+            self.GPS_init_xpos = msg.data[0]
+            self.init_counter += 1
+
+        print(self.GPS_init_xpos)
         self.GPS = msg.data
-        print(self.path_is_ready)
         if self.path_is_ready:
 
-
             target_speed = -1   # [m/s]
-
             # initial state
             state.update_from_gps(self.GPS, target_speed)  # yaw+3.14?
             lastIndex = len(path.cx) - 1
@@ -72,10 +81,27 @@ class Wrapper:
 
             #if lastIndex <= target_ind:
 
-            if self.GPS[0] > 50000:             # Cancels at gps.x > 7 atm
-                print('mmmmmmmmmmmmmmmmmmmmmmmmmmmmmm')
+            if self.offset != None and self.parking_length != None:
+                dist_traveled_x = np.abs(msg.data[0] - self.GPS_init_xpos)
+                if dist_traveled_x > self.offset + self.parking_length:  #TODO: subsribe to arduino aswell and use backsensor to stop
+                    print('Goal reached, shutting down')
+                    msg_to_publish.angle = 0
+                    msg_to_publish.speed = 0
+                    print(angle,target_speed)
+                    pub.publish(msg_to_publish)
+
+                    self.ros_plot(state, states)
+                    rospy.on_shutdown(self.shutdown_hook())
+            if self.backsensor_dist <0.3
+                print('Goal reached, shutting down')
+                msg_to_publish.angle = 0
+                msg_to_publish.speed = 0
+                print(angle,target_speed)
+                pub.publish(msg_to_publish)
+
                 self.ros_plot(state, states)
                 rospy.on_shutdown(self.shutdown_hook())
+
 
     def path_callback(self, msg):  # fix callback when mapping is done
         #print(msg.data[3])
@@ -84,9 +110,14 @@ class Wrapper:
             a =  msg.data[0] # 0.8960
             b =  msg.data[1] # 0.6765
             c =  msg.data[2] # 0
+            self.offset = msg.data[4]
+            self.parking_length = msg.data[5]
             path.set_path(a, b, c, self.GPS[0], self.GPS[1], self.GPS[2])
             self.counter += 1
             self.path_is_ready = True
+
+    def ultrasonic_callback:(self,msg):
+        self.backsensor_dist = msg.data[0]  # 1 ,2 ?
 
 if __name__ == '__main__':
 
@@ -100,7 +131,9 @@ if __name__ == '__main__':
     wrap = Wrapper()
     state = pure_pursuit.State()
     states = pure_pursuit.States()
+
     while not rospy.is_shutdown():
-        rospy.Subscriber('GPS_pos', Float32MultiArray, wrap.GPS_callback)
-        rospy.Subscriber('path_planner', Float32MultiArray, wrap.path_callback)
+        rospy.Subscriber('GPS_pos', Float64MultiArray, wrap.GPS_callback)
+        rospy.Subscriber('path_planner', Float64MultiArray, wrap.path_callback)
+        rospy.Subscriber('ultrasonic', Float64MultiArray, wrap.ultrasonic_callback)
         rate.sleep()

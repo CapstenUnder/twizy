@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import path_planner
 import rospy
-from std_msgs.msg import Float32MultiArray
+from std_msgs.msg import Float64MultiArray
 
 
 class Wrapper:
@@ -41,16 +41,13 @@ class Wrapper:
 if __name__ == '__main__':
 
     rospy.init_node('PathPlanner')
-    pub = rospy.Publisher('path_planner', Float32MultiArray, queue_size=5)
-    msg_to_publish = Float32MultiArray()
+    pub = rospy.Publisher('path_planner', Float64MultiArray, queue_size=5)
+    msg_to_publish = Float64MultiArray()
     rate = rospy.Rate(1)  # Adjust rate?
 
     while not rospy.is_shutdown():
         #rospy.Subscriber('mapping', Float32MultiArray, Wrapper.mapper_callback)
-        msg_to_publish.data = [0.8960, 0.6765,0.0, 1.0]
-        print(msg_to_publish.data[0], msg_to_publish.data[1], msg_to_publish.data[2], msg_to_publish.data[3])
+        msg_to_publish.data = [0.8960, 0.6765,0.0, 1.0, 1.5, 5.5]
+        print(msg_to_publish.data[0], msg_to_publish.data[1], msg_to_publish.data[2], msg_to_publish.data[3], msg_to_publish.data[4], msg_to_publish.data[5])
         pub.publish(msg_to_publish)
         rate.sleep()
-
-
-

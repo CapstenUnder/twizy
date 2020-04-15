@@ -2,7 +2,7 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 #import tkinter
-import matplotlib
+#import matplotlib
 #matplotlib.use('TkAgg')
 
 # Parameters
@@ -177,7 +177,7 @@ def main():
     path = TargetCourse()
     cx = np.arange(0, 10, 0.1)
     #cy = [a * np.arctan(c / b + 3) + a * np.arctan((1 / b) * (x - 3 * b - c)) for x in cx]
-    cx , cy = path.set_path(a, b, c, -6, -2)
+    cx , cy = path.set_path(a, b, c, -6, -2, 3.14)
     target_speed = -1.5 / 3.6  # [m/s]
 
     T = 100.0  # max simulation time

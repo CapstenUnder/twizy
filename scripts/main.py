@@ -2,14 +2,13 @@
 import pure_pursuit
 import rospy
 from std_msgs.msg import Float32MultiArray
-from std_msg.msg import Boolean
 from twizy.msg import car_control
 from matplotlib import pyplot as plt
 import numpy as np
 import math
 
 
-class Wrapper:
+class Main:
 
     def __init__(self):
         self.counter = 0
@@ -92,16 +91,12 @@ class Wrapper:
 if __name__ == '__main__':
 
     rospy.init_node('pure_pursuit')
-    pub_c = rospy.Publisher('controls', car_control, queue_size=5)
-    pub_m = rospy.Publisher('control_main', Boolean,queue_size=5)
-    bool_to_publish = Boolean()
+    pub = rospy.Publisher('controls', car_control, queue_size=5)
     msg_to_publish = car_control
-
     rate = rospy.Rate(10)  # Adjust rate?
     path = pure_pursuit.TargetCourse()
-    wrap = Wrapper()
-    state = pure_pursuit.State()
-    states = pure_pursuit.States()
+    main = Main()
+
     while not rospy.is_shutdown():
         rospy.Subscriber('GPS_pos', Float32MultiArray, wrap.GPS_callback)
         rospy.Subscriber('path_planner', Float32MultiArray, wrap.path_callback)

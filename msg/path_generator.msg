@@ -1,4 +1,0 @@
-float32 a
-float32 b
-float32 c
-float32 done = 0

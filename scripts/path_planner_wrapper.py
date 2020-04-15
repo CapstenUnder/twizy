@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import path_planner
 import rospy
 from std_msgs.msg import Float32MultiArray

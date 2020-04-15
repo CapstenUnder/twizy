@@ -2,7 +2,6 @@
 import pure_pursuit
 import rospy
 from std_msgs.msg import Float32MultiArray
-from std_msg.msg import Boolean
 from twizy.msg import car_control
 from matplotlib import pyplot as plt
 import numpy as np
@@ -44,7 +43,7 @@ class Wrapper:
         if self.path_is_ready:
 
 
-            target_speed = -1 / 3.6  # [m/s]
+            target_speed = -1   # [m/s]
 
             # initial state
             state.update_from_gps(self.GPS, target_speed)  # yaw+3.14?
@@ -73,7 +72,7 @@ class Wrapper:
 
             #if lastIndex <= target_ind:
 
-            if self.GPS[0] > 7:             # Cancels at gps.x > 7 atm
+            if self.GPS[0] > 50000:             # Cancels at gps.x > 7 atm
                 print('mmmmmmmmmmmmmmmmmmmmmmmmmmmmmm')
                 self.ros_plot(state, states)
                 rospy.on_shutdown(self.shutdown_hook())
@@ -92,10 +91,9 @@ class Wrapper:
 if __name__ == '__main__':
 
     rospy.init_node('pure_pursuit')
-    pub_c = rospy.Publisher('controls', car_control, queue_size=5)
-    pub_m = rospy.Publisher('control_main', Boolean,queue_size=5)
-    bool_to_publish = Boolean()
-    msg_to_publish = car_control
+    pub = rospy.Publisher('controls', car_control, queue_size=5)
+
+    msg_to_publish = car_control()
 
     rate = rospy.Rate(10)  # Adjust rate?
     path = pure_pursuit.TargetCourse()

@@ -31,8 +31,18 @@ scripts/CANComunication.cpp
 add_executable(gps_left
 scripts/GPS_left.cpp
 )
+
 add_executable(gps_right
 scripts/GPS_right.cpp
+)
+
+target_link_libraries(gps_left
+${catkin_LIBRARIES}
+sbp
+)
+target_link_libraries(gps_right
+${catkin_LIBRARIES}
+sbp
 )
 
 target_link_libraries(control_node

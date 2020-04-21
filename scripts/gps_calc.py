@@ -13,13 +13,12 @@ qr = 0
 
 def calcangle():
      global angle
-     gps_x_diff = gps_h_x - gps_v_x
-     gps_y_diff = gps_h_y - gps_v_y
+     gps_x_diff = gps_v_x - gps_h_x
+     gps_y_diff = gps_v_y - gps_h_y
      #print( gps_x_diff)
      #print( gps_y_diff)
-     angle = np.arctan2(gps_y_diff, gps_x_diff) + np.pi/2
-     
-     
+     angle = np.arctan2(gps_y_diff, gps_x_diff) + np.pi
+     print([gps_x_diff, gps_y_diff, np.degrees(angle)])
 
 
      
@@ -29,7 +28,7 @@ def talker():
     while not rospy.is_shutdown():
         msg_to_publish.data = [gps_v_x, gps_v_y, angle]
         pub.publish(msg_to_publish)
-	print([gps_v_x, gps_v_y, angle])
+	#print([gps_v_x, gps_v_y, angle])
 	break
         
 def callback_h(data):

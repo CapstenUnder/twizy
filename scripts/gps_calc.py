@@ -12,9 +12,6 @@ msg_to_publish = Float32MultiArray()
 
 global qr
 qr = 0
-global x_ref, y_ref, angle_ref
-global temp
-temp = 0
 
 def get_ref():
     x_ref = gps_v_x
@@ -29,15 +26,13 @@ def calcangle():
      #print( gps_y_diff)
      angle = np.arctan2(gps_y_diff, gps_x_diff) + np.pi
      #print([gps_x_diff, gps_y_diff, np.degrees(angle)])
-     if not temp:
-         get_ref()
 
 def talker():
     pub = rospy.Publisher('GPS_pos', Float32MultiArray , queue_size=2)
     while not rospy.is_shutdown():
         msg_to_publish.data = [gps_v_x, gps_v_y, angle]
         pub.publish(msg_to_publish)
-	    print([gps_v_x - x_ref, gps_v_y - y_ref, angle - angle_ref])
+	print([gps_v_x, gps_v_y, angle])
 	break
 
 def callback_h(data):

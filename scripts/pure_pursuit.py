@@ -1,9 +1,9 @@
 import numpy as np
 import math
 import matplotlib.pyplot as plt
-#import tkinter
-#import matplotlib
-#matplotlib.use('TkAgg')
+import tkinter
+import matplotlib
+matplotlib.use('TkAgg')
 
 # Parameters
 k = 0.1    # look forward gain
@@ -95,7 +95,7 @@ class TargetCourse:
         rear_x = gps_x - ((WB / 2) * math.cos(yaw))
         rear_y = gps_y - ((WB / 2) * math.sin(yaw))
 
-        self.cx = np.arange(rear_x, rear_x + 10, 0.1)
+        self.cx = np.arange(rear_x, rear_x + 20 - 1.25, 0.1)
         self.cy = [a * np.arctan(c / b + 3) + a * np.arctan((1 / b) * ((x-rear_x) - 3 * b - c)) for x in self.cx]
         self.cy = [y + rear_y for y in self.cy]
         return self.cx, self.cy
@@ -176,6 +176,8 @@ def main():
     #  target course
     path = TargetCourse()
     cx = np.arange(0, 10, 0.1)
+    offset = 1
+    parking_length = 5.5
     #cy = [a * np.arctan(c / b + 3) + a * np.arctan((1 / b) * (x - 3 * b - c)) for x in cx]
     cx , cy = path.set_path(a, b, c, -6, -2, 3.14)
     target_speed = -1.5 / 3.6  # [m/s]

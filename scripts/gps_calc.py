@@ -37,7 +37,7 @@ def talker():
     while not rospy.is_shutdown():
         msg_to_publish.data = [gps_v_x, gps_v_y, angle]
         pub.publish(msg_to_publish)
-	print([gps_v_x, gps_v_y, angle])
+	    print([gps_v_x - x_ref, gps_v_y - y_ref, angle - angle_ref])
 	break
 
 def callback_h(data):

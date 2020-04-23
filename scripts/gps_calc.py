@@ -7,31 +7,34 @@ import errno
 import utm
 from std_msgs.msg import Float32MultiArray
 from std_msgs.msg import String
+
 msg_to_publish = Float32MultiArray()
+
 global qr
 qr = 0
 
+def get_ref():
+    x_ref = gps_v_x
+    y_ref = gps_v_y
+    angle_ref = angle
+
 def calcangle():
      global angle
-     gps_x_diff = gps_h_x - gps_v_x
-     gps_y_diff = gps_h_y - gps_v_y
+     gps_x_diff = gps_v_x - gps_h_x
+     gps_y_diff = gps_v_y - gps_h_y
      #print( gps_x_diff)
      #print( gps_y_diff)
-     angle = np.arctan2(gps_y_diff, gps_x_diff) + np.pi/2
-     
-     
+     angle = np.arctan2(gps_y_diff, gps_x_diff) + np.pi
+     #print([gps_x_diff, gps_y_diff, np.degrees(angle)])
 
-
-     
 def talker():
-
     pub = rospy.Publisher('GPS_pos', Float32MultiArray , queue_size=2)
     while not rospy.is_shutdown():
         msg_to_publish.data = [gps_v_x, gps_v_y, angle]
         pub.publish(msg_to_publish)
 	print([gps_v_x, gps_v_y, angle])
 	break
-        
+
 def callback_h(data):
     gps_string_h = data.data
     GPS_h = gps_string_h.split(",")
@@ -53,7 +56,6 @@ def callback_h(data):
     gps_v_x = gps_v_pos[0]
     gps_v_y = gps_v_pos[1]
     #print(data.data)
-    #print('hej')
     #print(GPS_h_lon)
     #print(GPS_h_lat)
     

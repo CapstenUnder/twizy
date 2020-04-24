@@ -44,19 +44,19 @@ def talker():
         y = gps_v_y - y_ref
         local_x = x * np.cos(angle_ref) - y * np.sin(angle_ref)
         local_y = x * np.sin(angle_ref) + y * np.cos(angle_ref)
-        local_angle = (angle - angle_ref) % 2*np.pi
+        local_angle = (angle - angle_ref) % (2*np.pi)
 
         msg_to_publish.data = [local_x, local_y, local_angle]
         pub.publish(msg_to_publish)
 
-	size = 5
-	plt.scatter(x, y, color="red")
-	plt.scatter(local_x, local_y, color="blue")
-	plt.axis([-size, size, -size, size])
-	plt.ion()
-	plt.show()
-	plt.pause(0.01)
-	print([local_x, local_y, np.degrees(local_angle), angle,  angle_ref])
+	#size = 5
+	#plt.scatter(x, y, color="red")
+	#plt.scatter(local_x, local_y, color="blue")
+	#plt.axis([-size, size, -size, size])
+	#plt.ion()
+	#plt.show()
+	#plt.pause(0.01)
+	print([local_x, local_y, np.degrees(local_angle), np.degrees(angle), angle_ref])
         #print([gps_v_x, gps_v_y, angle])
         break
 
@@ -77,8 +77,10 @@ def callback_h(data):
 
     global run_once
     if run_once < 10:
-        get_ref()
         run_once += 1
+    elif run_once == 10:
+	get_ref()
+	run_once += 1
 
     talker()
 

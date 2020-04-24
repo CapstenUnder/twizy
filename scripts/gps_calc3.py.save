@@ -20,7 +20,7 @@ def get_ref():
     global x_ref, y_ref, angle_ref
     x_ref = gps_v_x
     y_ref = gps_v_y
-    angle_ref = 2*np.pi - angle
+    angle_ref = angle
 
 
 def calc_angle():
@@ -43,25 +43,28 @@ def talker():
         x = gps_v_x - x_ref
         y = gps_v_y - y_ref
 
-
         local_x = x * np.cos(angle_ref) - y * np.sin(angle_ref)
         local_y = x * np.sin(angle_ref) + y * np.cos(angle_ref)
-        local_angle = (angle + angle_ref) % (2*np.pi)
+        local_angle = (angle - angle_ref) % (2*np.pi)
+
+	# odd stuff might not work
+	if angle_ref < np.pi/2 or angle_ref > np.pi*6/4:
+		angle_ref = 0
+	else:
+		angle_ref = np.pi
+	#end of odd code
 
         msg_to_publish.data = [local_x, local_y, local_angle]
 	#msg_to_publish.data = [x, y, angle]
 	pub.publish(msg_to_publish)
 
-	"""
-	size = 10
+	size = 8
 	plt.scatter(x, y, color="red")
 	plt.scatter(local_x, local_y, color="blue")
 	plt.axis([-size, size, -size, size])
 	plt.ion()
 	plt.show()
 	plt.pause(0.01)
-
-	"""
 	print([local_x, local_y, np.degrees(local_angle), np.degrees(angle), angle_ref])
         #print([gps_v_x, gps_v_y, angle])
         break

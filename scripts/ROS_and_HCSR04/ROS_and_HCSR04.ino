@@ -62,9 +62,9 @@ float calculateDistance(const int trigPin, const int echoPin, float distance){
 void loop() {
   // Clears the trigPin
   float distance1 = calculateDistance(trigPin1, echoPin1, distanceFrontWheel);
-  delay(300);
+  delay(50);
   float distance2 =  calculateDistance(trigPin2, echoPin2, distanceRearWheel);
-  delay(300);
+  delay(50);
   float distance3 = calculateDistance(trigPin3, echoPin3, distanceReverse);
 
   float distanceArray [3] = {distance1, distance2, distance3}; 
@@ -76,5 +76,5 @@ void loop() {
   // Prints the distance on the Serial Monitor
   //Serial.print("Distance: ");
   //Serial.println(distance);
-  delay(300);
+  delay(50);
 }

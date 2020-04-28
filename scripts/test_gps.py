@@ -11,14 +11,14 @@ msg_to_publish = Float64MultiArray()
 
 def talker():
 
-    pub = rospy.Publisher('GPS_pos', Float64MultiArray , queue_size=2)
-    a= 0
+    pub = rospy.Publisher('chatter', Float64MultiArray , queue_size=2)
+    a= 3
     b= 0
     c= 3.14
     while not rospy.is_shutdown():
-        a += 0.01
-        b += 0.01
-        c += 0.01
+        a -= 0.01
+        b -= 0.01
+        c -= 0.01
         msg_to_publish.data = [a, b, c]
         pub.publish(msg_to_publish)
 	print([a, b, c])

@@ -9,8 +9,7 @@ from twizy.msg import car_control
 def callback_ultrasonicsensor(data):
     #rospy.loginfo(rospy.get_caller_id() + 'i heard %s', data.data)
     current_distances = data.data #array from ultrasonic is saved in current distances
-    dist_file = open("distances.txt", "a")
-    dist_file.write(str(current_distances[2]) + ",") #write values from rear sensor to file
+    dist_file.write(str(current_distances[0]) + ",") #write values from rear sensor to file
 
 def main():
     print('main')
@@ -18,16 +17,18 @@ def main():
     rate = rospy.Rate(10) # 10hz
   # initializes the custom message and makes sure the starting values are 0
     msg = car_control()
-    speed = 0
+    speed = 1
+    msg.speed = speed
+    pub.publish(msg)
     collision_warning = emergency_brake()
     if(collision_warning == True):
         while not rospy.is_shutdown():
+			speed = 0
 			msg.speed = speed
 			print("Distance to rear sensor too small! Engaging emergencybrake")
 			pub.publish(msg)
 			rate.sleep()
 			
-
 
 def emergency_brake(): #read values from file, take mean value of 10, if < 0.3 return true
     dist = 0
@@ -44,17 +45,17 @@ def emergency_brake(): #read values from file, take mean value of 10, if < 0.3 r
 	    for x in range(first_index, last_index):
 		dist += dist_array[x]
 	    print(dist/10)
-	    if dist/10 < 0.3:
+	    if dist/10 < 30:
 			return True
+				
 
 
-def listener():
-    pass
 
 if __name__ == '__main__':
     rospy.init_node('emergency_brake_listener', anonymous=True)
     rate = rospy.Rate(10)
-    
+    open('distances.txt', 'w').close()
+    dist_file = open("distances.txt", "a")
     while not rospy.is_shutdown():
         try:
 	    rospy.Subscriber('chatter', Float64MultiArray, callback_ultrasonicsensor)

@@ -30,6 +30,8 @@ class Wrapper:
             msg_to_publish.data[1] = b
             msg_to_publish.data[2] = c
             msg_to_publish.done[3] = 1
+	    msg_to_publish.done[4] = offset
+            msg_to_publish.done[5] = parking_length
         else:
             print('Mapping not yet done!')
             msg_to_publish.data[0] = 0

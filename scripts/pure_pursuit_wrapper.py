@@ -20,6 +20,7 @@ class Wrapper:
         self.GPS_init_xpos = None
         self.init_counter = 0
         self.backsensor_dist = None
+	self.collision_warning = False
 
     def shutdown_hook(self):
         print('Goal reached!')
@@ -48,8 +49,6 @@ class Wrapper:
         if self.init_counter < 1:
             self.GPS_init_xpos = msg.data[0]
             self.init_counter += 1
-
-        print(self.GPS_init_xpos)
         self.GPS = msg.data
         if self.path_is_ready:
 
@@ -69,44 +68,35 @@ class Wrapper:
             state.update_from_gps(self.GPS, ai)
             di = di*180/math.pi         # convert to degrees
             if di < -40:
-                angle = -40
+                angle = -40		# capping the steering angle at +-40 degrees
             elif di > 40:
-                angle = 40
-            else:
+		angle = 40
+	    else:
                 angle = di
             msg_to_publish.angle = angle
             msg_to_publish.speed = target_speed
-            print(angle,target_speed)
+            #print(angle,target_speed)
             pub.publish(msg_to_publish)
 
-            #if lastIndex <= target_ind:
 
-            if self.offset != None and self.parking_length != None:
-                dist_traveled_x = np.abs(msg.data[0] - self.GPS_init_xpos)
-                if dist_traveled_x > self.offset + self.parking_length:  #TODO: subsribe to arduino aswell and use backsensor to stop
-                    print('Goal reached, shutting down')
-                    msg_to_publish.angle = 0
-                    msg_to_publish.speed = 0
-                    print(angle,target_speed)
-                    pub.publish(msg_to_publish)
-
-                    self.ros_plot(state, states)
-                    rospy.on_shutdown(self.shutdown_hook())
-            if self.backsensor_dist <0.3
+          	# stops if 
+            dist_traveled_x = np.abs(msg.data[0] - self.GPS_init_xpos)
+            if dist_traveled_x > self.offset + self.parking_length or self.collision_warning:
                 print('Goal reached, shutting down')
                 msg_to_publish.angle = 0
                 msg_to_publish.speed = 0
                 print(angle,target_speed)
                 pub.publish(msg_to_publish)
-
                 self.ros_plot(state, states)
-                rospy.on_shutdown(self.shutdown_hook())
+                rospy.on_shutdown(self.shutdown_hook())		#TODO: shutdown properly
+
+
+
 
 
     def path_callback(self, msg):  # fix callback when mapping is done
-        #print(msg.data[3])
         path.path_generated =  msg.data[3]
-        if path.is_path_generated() == 1 and self.counter < 1 and self.GPS != None:  # TODO: only execute once!
+        if path.is_path_generated() == 1 and self.counter < 1 and self.GPS != None:  
             a =  msg.data[0] # 0.8960
             b =  msg.data[1] # 0.6765
             c =  msg.data[2] # 0
@@ -115,10 +105,36 @@ class Wrapper:
             path.set_path(a, b, c, self.GPS[0], self.GPS[1], self.GPS[2])
             self.counter += 1
             self.path_is_ready = True
+	    print('helo')
 
-    def ultrasonic_callback:(self,msg):
-        self.backsensor_dist = msg.data[0]  # 1 ,2 ?
+    def ultrasonic_callback(self,msg):
+	if self.path_is_ready:
+            current_distances = msg.data #array from ultrasonic is saved in current distances
+            dist_file.write(str(current_distances[0]) + ",") #write values from rear sensor to file
 
+
+    def emergency_break(self):
+	print ('collsion: ' , self.collision_warning)
+        if self.path_is_ready: 
+	   # initializes the custom message and makes sure the starting values are 0
+	    dist = 0
+	    dist_array = []
+	    with open("distances.txt", "r") as dist_file:
+			for line in dist_file.readlines():
+			    f_list = [float(i) for i in line.split(",") if i.strip()]
+			    dist_array += f_list
+	    
+	    if len(dist_array) > 15:
+		    last_index = len(dist_array)
+		    first_index = last_index - 10
+
+		    for x in range(first_index, last_index):
+			dist += dist_array[x]
+		    print(dist/10)
+		    if dist/10 < 30:
+			self.collision_warning = True
+
+	   
 if __name__ == '__main__':
 
     rospy.init_node('pure_pursuit')
@@ -126,14 +142,18 @@ if __name__ == '__main__':
 
     msg_to_publish = car_control()
 
-    rate = rospy.Rate(10)  # Adjust rate?
+    rate = rospy.Rate(1)  # Adjust rate?
     path = pure_pursuit.TargetCourse()
     wrap = Wrapper()
     state = pure_pursuit.State()
     states = pure_pursuit.States()
 
+    open('distances.txt', 'w').close()
+    dist_file = open("distances.txt", "a")
+
     while not rospy.is_shutdown():
-        rospy.Subscriber('GPS_pos', Float64MultiArray, wrap.GPS_callback)
-        rospy.Subscriber('path_planner', Float64MultiArray, wrap.path_callback)
-        rospy.Subscriber('ultrasonic', Float64MultiArray, wrap.ultrasonic_callback)
+        rospy.Subscriber('GPS_pos', Float64MultiArray, wrap.GPS_callback)		# x_pos, y_pos, heading_angle
+        rospy.Subscriber('path_planner', Float64MultiArray, wrap.path_callback)		# a, b, c, Boolean_done, offset, parking_length 
+        rospy.Subscriber('ultrasonic', Float64MultiArray, wrap.ultrasonic_callback)	# back_sensor, side_sensor_back, side_sensor_front
+	wrap.emergency_break()
         rate.sleep()

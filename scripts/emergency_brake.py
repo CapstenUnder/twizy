@@ -17,7 +17,9 @@ def main():
     rate = rospy.Rate(10) # 10hz
   # initializes the custom message and makes sure the starting values are 0
     msg = car_control()
-    speed = 1
+
+    speed = 1  # Should change it to 0 to not interfer with other speed messages
+
     msg.speed = speed
     pub.publish(msg)
     collision_warning = emergency_brake()

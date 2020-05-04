@@ -20,7 +20,7 @@ def get_ref():
     global x_ref, y_ref, angle_ref
     x_ref = gps_v_x
     y_ref = gps_v_y
-    angle_ref = 2*np.pi - angle
+    angle_ref = 2*np.pi - angle + np.pi/2
 
 
 def calc_angle():

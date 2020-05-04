@@ -2,12 +2,12 @@
 import numpy as np
 import rospy
 import utm
-from std_msgs.msg import Float32MultiArray
+from std_msgs.msg import Float64MultiArray
 from std_msgs.msg import String
 import matplotlib.pyplot as plt
 
 
-msg_to_publish = Float32MultiArray()
+msg_to_publish = Float64MultiArray()
 angle = 0
 gps_v_x, gps_h_x, gps_v_y, gps_h_y = 0, 0, 0, 0
 x_ref, y_ref, angle_ref = 0, 0, 0
@@ -36,7 +36,7 @@ def talker():
     global angle
     global x_ref, y_ref, angle_ref
 
-    pub = rospy.Publisher('GPS_pos', Float32MultiArray, queue_size=2)
+    pub = rospy.Publisher('GPS_pos', Float64MultiArray, queue_size=2)
     while not rospy.is_shutdown():
 
         # moves and rotates the global coordinates to local coordinate determined by the reference point and angle

@@ -5,7 +5,7 @@
 ros::NodeHandle nh;
 std_msgs::Float64MultiArray Distance;
 
-ros::Publisher chatter("chatter",&Distance);
+ros::Publisher ultrasonic("ultrasonic",&Distance);
 
 // defines pins numbers
 const int trigPin1 = 8;
@@ -23,7 +23,7 @@ float distanceFrontWheel, distanceRearWheel, distanceReverse;
 
 void setup() {
   nh.initNode();
-  nh.advertise(chatter);
+  nh.advertise(ultrasonic);
   
   
   pinMode(trigPin1, OUTPUT); // Sets the trigPin as an Output
@@ -71,7 +71,7 @@ void loop() {
   
   Distance.data = distanceArray;
   Distance.data_length = 3;
-  chatter.publish(&Distance);
+  ultrasonic.publish(&Distance);
   nh.spinOnce();
   // Prints the distance on the Serial Monitor
   //Serial.print("Distance: ");

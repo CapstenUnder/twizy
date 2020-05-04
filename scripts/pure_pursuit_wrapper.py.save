@@ -49,7 +49,7 @@ class Wrapper:
         if self.init_counter < 1:
             self.GPS_init_xpos = msg.data[0]
             self.init_counter += 1
-        self.GPS = msg.data
+        self.GPS = msg.dat
         if self.path_is_ready:
 
             target_speed = -1   # [m/s]

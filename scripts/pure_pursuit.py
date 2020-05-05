@@ -7,7 +7,7 @@ matplotlib.use('TkAgg')
 
 # Parameters
 k = 0.1    # look forward gain
-Lfc = 0.20  # [m] look-ahead distance
+Lfc = 0.30  # [m] look-ahead distance
 Kp = 2     # speed proportional gain
 dt = 0.1   # [s] time tick
 WB = 1.686  # [m] wheel base of vehicle
@@ -58,6 +58,8 @@ class States:
         self.x = []
         self.y = []
         self.yaw = []
+	self.rear_x = []
+	self.rear_y = []
         self.v = []
         self.t = []
 
@@ -65,6 +67,8 @@ class States:
         self.x.append(state.x)
         self.y.append(state.y)
         self.yaw.append(state.yaw)
+	self.rear_x.append(state.rear_x)
+	self.rear_y.append(state.rear_y)
         self.v.append(state.v)
         self.t.append(t)
 

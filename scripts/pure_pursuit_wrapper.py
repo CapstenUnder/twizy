@@ -29,7 +29,7 @@ class Wrapper:
     def ros_plot(self, state, states):
         plt.cla()
         plt.plot(path.cx, path.cy, ".r", label="course")
-        plt.plot(states.x, states.y, "-b", label="trajectory")
+        plt.plot(states.rear_x, states.rear_y, "-b", label="trajectory")
         plt.legend()
         plt.xlabel("x[m]")
         plt.ylabel("y[m]")
@@ -51,7 +51,7 @@ class Wrapper:
             self.init_counter += 1
         self.GPS = msg.data
         if self.path_is_ready:
-
+	    print('yaw angle: ', self.GPS[2])
             target_speed = -1   # [m/s]
             # initial state
             state.update_from_gps(self.GPS, target_speed)  # yaw+3.14?
@@ -64,7 +64,8 @@ class Wrapper:
             ai = pure_pursuit.proportional_control(target_speed, state.v)
             di, target_ind = pure_pursuit.pure_pursuit_steer_control(
                 state, path, target_ind)
-            state.update_from_gps(self.GPS, ai)
+
+
             di = di*180/math.pi         # convert to degrees
             if di < -40:
                 angle = -40		# capping the steering angle at +-40 degrees

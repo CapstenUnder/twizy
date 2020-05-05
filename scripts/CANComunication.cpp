@@ -13,9 +13,10 @@ int CANComunication::StartCan()
 {
 	std::cout << "startcan" << std::endl;
 	canInitializeLibrary();
-	
+
 	int CHANNEL_NUMBER = 0;
 	hnd = canOpenChannel(CHANNEL_NUMBER, canOPEN_ACCEPT_VIRTUAL);
+
 	if (hnd < 0)
 	{
 		printf("canOpenCHannel failed, status=%d\n", hnd);

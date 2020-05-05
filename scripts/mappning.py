@@ -4,6 +4,7 @@
 ## Simple talker demo that listens to std_msgs/Strings published
 ## to the 'ultrasonic' topic
 import math
+import numpy as np
 
 import rospy
 from std_msgs.msg import Float64
@@ -47,6 +48,7 @@ def mappning(current_distances):
     global endpoint
     global startpoint
 
+
     all_distances.append(current_distances.data)
 
     # 3 since 2.5m + 0.5m margin
@@ -76,6 +78,7 @@ def mappning(current_distances):
 # ALSO, GPS_history[len(GPS_history)-3][0]] --> GPS_history[-3]] Due to an array of x,y,angle
 	# Maybe exclude the angle later on?
     # 3 since 2.5m + 0.5m margin
+
     if all_distances[-1][1] > 300 and all_distances[-2][1] > 300 \
             and all_distances[-3][1] > 300:
         # Pair the sensordistances with a gps-position (imaginary) if large enough (empty parkingspot)
@@ -89,45 +92,52 @@ def mappning(current_distances):
 	    print("\nSTARTPOINT")
             print(startpoint)
         pspot_distances.append([all_distances[-1][1], GPS_history[-1]])
-	print(all_distances[-1][0])
-	print(all_distances[-1][1])
-	print(GPS_history[-1])
-	print(pspot_distances[-1])
+	#print(all_distances[-1][0])
+	#print(all_distances[-1][1])
+	#print(GPS_history[-1])
+	#print(pspot_distances[-1])
 
     elif all_distances[-1][1] <= 300 and all_distances[-2][1] <= 300\
             and all_distances[-3][1] <= 300 and \
             all_distances[-4][1] > 300 and all_distances[-5][1] > 300 \
             and all_distances[-6][1] > 300:
 	
-	if endpoint == []:  
+	if endpoint == [0,()]:  # TEST: Changed [] to [0,()]
 # Check if there is an endpoint
-	    endpoint=[all_distances[-4][1], GPS_history[-4]]  # Instead of a list, it is now a value
+	    endpoint = [all_distances[-4][1], GPS_history[-4]]  # Instead of a list, it is now a value
 							     # Should only be one anyways
 	    print("\nENDPOINT")
             print(endpoint)
-	    if math.hypot(endpoint[1][0]-startpoint[1][0], endpoint[1][1]-startpoint[1][1]) < 500:
-		# Check if the length is enough. If not, reset it
-		endpoint = []
-	        print("\nENDPOINT")
-                print(endpoint)
+#	    if math.hypot(endpoint[1][0]-startpoint[1][0], endpoint[1][1]-startpoint[1][1]) < 500:
+#		# Check if the length is enough. If not, reset it
+#		endpoint = [0,()]
+#	        print("\nENDPOINT")
+#               print(endpoint)
 
 # pythagoras of deltax and deltay first[1] for gps, second [0] or [1] for x or y coordinate
 # Only append one endpoint, overwrites the old endpoint
 
 
-    if endpoint != [] and startpoint != []:  # Continue to update the offset & distance to car
+    if endpoint != [0,()] and startpoint != [0,()]:  # Continue to update the offset & distance to car
+        print(endpoint[1])
+	print(endpoint)
+        #print(startpoint[1])
+	#print(startpoint)
     	parking_length = math.hypot(endpoint[1][0]-startpoint[1][0], endpoint[1][1]-startpoint[1][1])
 
-	offset = GPS_history[-1] - endpoint[1] # Should compare the gps array. [x,y,angle]
+	offset = math.hypot(GPS_history[-1][0] - endpoint[1][0], GPS_history[-1][1] - endpoint[1][1])
 	distance_to_car = all_distances[-1][1]  # Latest distance measured from rearwheel
 	print("\nIN if statement")
+	print(endpoint)
+
 
 # TODO: 
 	#implement that it is only ok if parking_length > 5 meter
 	# now it is dependant on GPS signal, have not tested it outside where GPS works
 	# line 121 not working, it is a list!
+	# If statement for skipping first 5 values for the startpoint
 
-
+    print(endpoint)
     talker()  # Added this call to the talker to publish mapping variables []
 
 
@@ -144,7 +154,7 @@ def controller():
 	    # Drive forward 1 km/h until endpoint is found (i.e. done mapping, spot found)
 	    #msg_to_publish.speed = 1  # added the following part of code
 	    msg_to_publish.angle = 0
-	    if endpoint != []:
+	    if endpoint != [0,()]:
 	    	msg_to_publish.speed = 0
 
 	    pub.publish(msg_to_publish)
@@ -159,7 +169,7 @@ def talker():
     pub = rospy.Publisher('mappning', Float64MultiArray, queue_size=2)
     while not rospy.is_shutdown():
         mapping_variables.data = [parking_length, offset, distance_to_car]
-	print([parking_length, offset, distance_to_car])
+	#print([parking_length, offset, distance_to_car])
 	pub.publish(mapping_variables)
 	break  # I och med rospy.spin() behovs val inte while och break? Har utgatt fran gps_calc.
 	       # Andra aven dar i sa fall
@@ -176,7 +186,7 @@ if __name__ == '__main__':
     GPS_history = []
     all_distances = []
     pspot_distances = []
-    startpoint = []  # Changed both to None/[] (after changing from list to array)
-    endpoint = []
+    startpoint = [0,()]  # Changed both to None/[] (after changing from list to array)
+    endpoint = [0,()]
     rospy.init_node('mappning', anonymous=True)
     listener()

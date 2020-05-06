@@ -29,15 +29,19 @@ class Wrapper:
             msg_to_publish.data[0] = a
             msg_to_publish.data[1] = b
             msg_to_publish.data[2] = c
-            msg_to_publish.done[3] = 1
-	    msg_to_publish.done[4] = offset
-            msg_to_publish.done[5] = parking_length
+            msg_to_publish.data[3] = 1
+	    msg_to_publish.data[4] = offset
+            msg_to_publish.data[5] = parking_length
+	    pub.publish(msg_to_publish)
         else:
             print('Mapping not yet done!')
             msg_to_publish.data[0] = 0
             msg_to_publish.data[1] = 0
             msg_to_publish.data[2] = 0
             msg_to_publish.data[3] = 0
+    	    msg_to_publish.data[4] = 0
+	    msg_to_publish.data[5] = 0
+ 	    pub.publish(msg_to_publish)
 
 
 if __name__ == '__main__':
@@ -48,8 +52,8 @@ if __name__ == '__main__':
     rate = rospy.Rate(1)  # Adjust rate?
 
     while not rospy.is_shutdown():
-        #rospy.Subscriber('mapping', Float32MultiArray, Wrapper.mapper_callback)
-        msg_to_publish.data = [0.8960, 0.6765,0.0, 1.0, 1.5, 5.5]
-        print(msg_to_publish.data[0], msg_to_publish.data[1], msg_to_publish.data[2], msg_to_publish.data[3], msg_to_publish.data[4], msg_to_publish.data[5])
-        pub.publish(msg_to_publish)
+        rospy.Subscriber('mapping', Float32MultiArray, Wrapper.mapper_callback)
+        #msg_to_publish.data = [0.8960, 0.6765,0.0, 1.0, 1.5, 5.5]
+        #print(msg_to_publish.data[0], msg_to_publish.data[1], msg_to_publish.data[2], msg_to_publish.data[3], msg_to_publish.data[4], msg_to_publish.data[5])
+        #pub.publish(msg_to_publish)
         rate.sleep()

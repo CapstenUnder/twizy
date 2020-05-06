@@ -25,7 +25,7 @@ class Wrapper:
         print('Goal reached!')
 
 
-    def ros_plot(self, states):
+    def ros_plot(self, states, path):
         plt.cla()
         plt.plot(path.cx, path.cy, ".r", label="course")
         plt.plot(states.rear_x, states.rear_y, "-b", label="trajectory")
@@ -78,7 +78,7 @@ class Wrapper:
                 msg_to_publish.speed = 0
                 print(angle,target_speed)
                 pub.publish(msg_to_publish)
-                self.ros_plot(states)
+                self.ros_plot(states, path)
                 #rospy.on_shutdown(self.shutdown_hook())
 		while 1:
 			print("done")
@@ -94,7 +94,7 @@ class Wrapper:
             c =  msg.data[2] # 0
             self.offset = msg.data[4]
             self.parking_length = msg.data[5]
-            path.set_path(a, b, c, self.GPS[0], self.GPS[1], self.GPS[2])
+             path.set_path(a, b, c, self.GPS[0], self.GPS[1], self.GPS[2])
             self.counter += 1
             self.path_is_ready = True
 	    print('helo')

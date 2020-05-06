@@ -58,8 +58,8 @@ class States:
         self.x = []
         self.y = []
         self.yaw = []
-	self.rear_x = []
-	self.rear_y = []
+        self.rear_x = []
+        self.rear_y = []
         self.v = []
         self.t = []
 
@@ -67,8 +67,8 @@ class States:
         self.x.append(state.x)
         self.y.append(state.y)
         self.yaw.append(state.yaw)
-	self.rear_x.append(state.rear_x)
-	self.rear_y.append(state.rear_y)
+        self.rear_x.append(state.rear_x)
+        self.rear_y.append(state.rear_y)
         self.v.append(state.v)
         self.t.append(t)
 
@@ -100,8 +100,7 @@ class TargetCourse:
         rear_y = gps_y - ((WB / 2) * math.sin(yaw))
 
         self.cx = np.arange(rear_x, rear_x + 20 - 1.25, 0.1)
-        self.cy = [a * np.arctan((1/b)*((-rear_x) -3*b-c)) + a * np.arctan((1 / b) * ((x-rear_x) - 3 * b - c)) for x in self.cx]
-        self.cy = [y + rear_y for y in self.cy]
+        self.cy = [rear_y + a * np.arctan((1/b)*((-rear_x) -3*b-c)) + a * np.arctan((1 / b) * ((x-rear_x) - 3 * b - c)) for x in self.cx]
         return self.cx, self.cy
 
 
@@ -182,14 +181,13 @@ def main():
     cx = np.arange(0, 10, 0.1)
     offset = 1
     parking_length = 5.5
-    #cy = [a * np.arctan(c / b + 3) + a * np.arctan((1 / b) * (x - 3 * b - c)) for x in cx]
-    cx , cy = path.set_path(a, b, c, -6, -2, 3.14)
-    target_speed = -1.5 / 3.6  # [m/s]
+    cx , cy = path.set_path(a, b, c, -6, -5, 3.14)
+    target_speed = -5 / 3.6  # [m/s]
 
     T = 100.0  # max simulation time
 
     # initial state
-    state = State(x=-6, y=-2, yaw=3.14, v=0.0)
+    state = State(x=-6, y=-5, yaw=3.14, v=0.0)
 
     lastIndex = len(cx) - 1
     time = 0.0
@@ -218,7 +216,7 @@ def main():
                 lambda event: [exit(0) if event.key == 'escape' else None])
             plot_arrow(state.x, state.y, state.yaw)
             plt.plot(cx, cy, "-r", label="course")
-            plt.plot(states.x, states.y, "-b", label="trajectory")
+            plt.plot(states.rear_x, states.rear_y, "-b", label="trajectory")
             plt.plot(cx[target_ind], cy[target_ind], "xg", label="target")
             plt.axis("equal")
             plt.grid(True)
@@ -231,7 +229,7 @@ def main():
     if show_animation:  # pragma: no cover
         plt.cla()
         plt.plot(cx, cy, ".r", label="course")
-        plt.plot(states.x, states.y, "-b", label="trajectory")
+        plt.plot(states.rear_x, states.rear_y, "-b", label="trajectory")
         plt.legend()
         plt.xlabel("x[m]")
         plt.ylabel("y[m]")

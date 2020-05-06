@@ -7,6 +7,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 import math
 
+
 class Wrapper:
 
     def __init__(self):
@@ -79,9 +80,10 @@ class Wrapper:
                 print(angle,target_speed)
                 pub.publish(msg_to_publish)
                 self.ros_plot(states)
-                #rospy.on_shutdown(self.shutdown_hook())
+                #rospy.on_shutdown(self.shutdown_hook()
 		while 1:
 			print("done")
+			time.sleep(1)
 
 
 

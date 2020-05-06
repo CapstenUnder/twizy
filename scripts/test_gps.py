@@ -12,17 +12,17 @@ msg_to_publish = Float64MultiArray()
 def talker():
 
     pub = rospy.Publisher('GPS_pos', Float64MultiArray , queue_size=2)
-    a= 3
-    b= 0
-    c= 40.14
+    a= -20
+    b= -5
+    c= 3.14
     while not rospy.is_shutdown():
-        a += 0.1
-	b += 0.1
-	c += 0.1
+        a += 0.01
+	b += 0.01
+	c += 0.01
         msg_to_publish.data = [a, b, c]
         pub.publish(msg_to_publish)
 	print([a, b, c])
-	rate = rospy.Rate(1)
+	rate = rospy.Rate(10)
 	rate.sleep()
 
 

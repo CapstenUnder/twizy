@@ -50,8 +50,8 @@ def mappning(current_distances):
 
     all_distances.append(current_distances.data)
 
-    if len(all_distances) > 4:  # Only check mapping after 5 values have been recorded
-        #controller()  # Controls the speed during the mapping sequence. 0 if parkingspot found (endpoint)
+    if len(all_distances) > 5:  # Only check mapping after 5 values have been recorded
+        controller()  # Controls the speed during the mapping sequence. 0 if parkingspot found (endpoint)
 
         if all_distances[-1][1] > 300 and all_distances[-2][1] > 300 \
                 and all_distances[-3][1] > 300:
@@ -81,13 +81,13 @@ def mappning(current_distances):
                 # Check if there is an endpoint
                 endpoint = [all_distances[-4][1], GPS_history[-4]]  # Instead of a list, it is now a value
                 # Should only be one anyways
-                print("\nENDPOINT")
+                print("\nENDPOINT CHECK")
                 print(endpoint)
 
                 if math.hypot(endpoint[1][0]-startpoint[1][0], endpoint[1][1]-startpoint[1][1]) < 500:
                     # Check if the length is enough. If not, reset it
                     endpoint = [0, ()]
-                    print("\nENDPOINT")
+                    print("\nENDPOINT SUCCESS")
                     print(endpoint)
 
         # pythagoras of deltax and deltay first[1] for gps, second [0] or [1] for x or y coordinate
@@ -96,18 +96,16 @@ def mappning(current_distances):
         # Sensor delay roughly 150 ms, so check every 1.5 sec (To change if not good enough)
         position_change = math.hypot(GPS_history[-10][0] - GPS_history[-1][0], GPS_history[-10][1] - GPS_history[-1][1])
 
-        if endpoint != [0, ()] and startpoint != [0, ()] and position_change < 5:
+        if endpoint != [0, ()] and startpoint != [0, ()]:
             # Continue to update the offset & distance to car
-            print(endpoint[1])
-            print(endpoint)
-            # print(startpoint[1])
-            # print(startpoint)
             parking_length = math.hypot(endpoint[1][0] - startpoint[1][0], endpoint[1][1] - startpoint[1][1])
-
             offset = math.hypot(GPS_history[-1][0] - endpoint[1][0], GPS_history[-1][1] - endpoint[1][1])
             distance_to_car = all_distances[-1][1]  # Latest distance measured from rearwheel
-            print("\nIN if statement")
-            print(endpoint)
+
+            if position_change < 5:
+                talker(1)  # Index tells talker if the car is standing still or not
+            else:
+                talker(0)  # Still moving
 
     # TODO:
     # implement that it is only ok if parking_length > 5 meter
@@ -119,8 +117,6 @@ def mappning(current_distances):
     # Of the mapping variables, only the offset is to be updated after an endpoint is found
     # if endpoint != [0, ()]:
     #    talker()  # Added this call to the talker to publish mapping variables []
-    print(endpoint)
-    talker()
 
 
 def controller():
@@ -136,22 +132,22 @@ def controller():
         msg_to_publish.angle = 0
         if endpoint != [0, ()]:
             msg_to_publish.speed = 0
-        #elif endpoint == [0, ()]:
-            #msg_to_publish.speed = 1
+        elif endpoint == [0, ()]:
+            msg_to_publish.speed = 1
 
         pub.publish(msg_to_publish)
         rate.sleep()
 
 
 # Added the following function monday afternoon
-def talker():
+def talker(standstill):
     global parking_length
     global offset
     global distance_to_car
 
     pub = rospy.Publisher('mappning', Float64MultiArray, queue_size=2)
     while not rospy.is_shutdown():
-        mapping_variables.data = [parking_length, offset, distance_to_car]
+        mapping_variables.data = [parking_length, offset, distance_to_car, standstill]
         # print([parking_length, offset, distance_to_car])
         pub.publish(mapping_variables)
         break  # I och med rospy.spin() behovs val inte while och break? Har utgatt fran gps_calc.

@@ -52,8 +52,8 @@ if __name__ == '__main__':
     rate = rospy.Rate(1)  # Adjust rate?
 
     while not rospy.is_shutdown():
-        rospy.Subscriber('mapping', Float32MultiArray, Wrapper.mapper_callback)
-        #msg_to_publish.data = [0.8960, 0.6765,0.0, 1.0, 1.5, 5.5]
-        #print(msg_to_publish.data[0], msg_to_publish.data[1], msg_to_publish.data[2], msg_to_publish.data[3], msg_to_publish.data[4], msg_to_publish.data[5])
-        #pub.publish(msg_to_publish)
+        #rospy.Subscriber('mapping', Float32MultiArray, Wrapper.mapper_callback)
+        msg_to_publish.data = [1.1679, 0.9473,0.0,1, 1, 5.5]
+        print(msg_to_publish.data[0], msg_to_publish.data[1], msg_to_publish.data[2], msg_to_publish.data[3], msg_to_publish.data[4], msg_to_publish.data[5])
+        pub.publish(msg_to_publish)
         rate.sleep()

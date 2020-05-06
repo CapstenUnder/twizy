@@ -62,10 +62,13 @@ float calculateDistance(const int trigPin, const int echoPin, float distance){
 void loop() {
   // Clears the trigPin
   float distance1 = calculateDistance(trigPin1, echoPin1, distanceFrontWheel);
+  if (float distance1 > 450) {float distance1 = 450;}
   delay(50);
   float distance2 =  calculateDistance(trigPin2, echoPin2, distanceRearWheel);
+  if (float distance2 > 450) {float distance2 = 450;}
   delay(50);
   float distance3 = calculateDistance(trigPin3, echoPin3, distanceReverse);
+  if (float distance3 > 450) {float distance3 = 450;}
 
   float distanceArray [3] = {distance1, distance2, distance3}; 
   

@@ -4,8 +4,6 @@
 ## Simple talker demo that listens to std_msgs/Strings published
 ## to the 'ultrasonic' topic
 import math
-import numpy as np
-
 import rospy
 from std_msgs.msg import Float64
 from std_msgs.msg import String
@@ -21,8 +19,8 @@ global endpoint
 global parking_length
 global offset
 global distance_to_car
-msg_to_publish = Float64MultiArray()
 mapping_variables = Float64MultiArray()
+global mapping_state
 
 
 def callback_ultrasonicsensor(data):
@@ -47,17 +45,26 @@ def mappning(current_distances):
     distance_to_car = 0
     global endpoint
     global startpoint
+    global mapping_state
 
+    # Adjustments to measure distance from GPS-unit to the object (not sensor to object)
+    # distance_gps_rearwheelsensor = XX
+    # object_coordinates = GPS_history[1] + distance/100
+    # y-distance is orthogonal if driving straight forward. If not, *rotation matrix(current_angle)
+
+    position_change = 100  # Init to enter mapping
     all_distances.append(current_distances.data)
 
-    if len(all_distances) > 5:  # Only check mapping after 5 values have been recorded
-        controller()  # Controls the speed during the mapping sequence. 0 if parkingspot found (endpoint)
-
+    #print("PRE loop")
+    if len(all_distances) > 5 and mapping_state == True:  # Only check mapping after 5 values have been recorded
+        #print("FIRST")
+	controller()  # Controls the speed during the mapping sequence. 0 if parkingspot found (endpoint)
+	#print("post controller")
         if all_distances[-1][1] > 300 and all_distances[-2][1] > 300 \
                 and all_distances[-3][1] > 300:
             # Pair the sensordistances with a gps-position (imaginary) if large enough (empty parkingspot)
             if all_distances[-4][1] <= 300 and all_distances[-5][1] <= 300 \
-                    and all_distances[-6][1] <= 300:
+                    and all_distances[-6][1] <= 300 and endpoint == [0, ()]:
                 # If it is the first time, include the previous ok measurements (3 in a row)
                 pspot_distances.append([all_distances[-3][1], GPS_history[-3]])
                 pspot_distances.append([all_distances[-2][1], GPS_history[-2]])
@@ -66,10 +73,6 @@ def mappning(current_distances):
                 print("\nSTARTPOINT")
                 print(startpoint)
             pspot_distances.append([all_distances[-1][1], GPS_history[-1]])
-        # print(all_distances[-1][0])
-        # print(all_distances[-1][1])
-        # print(GPS_history[-1])
-        # print(pspot_distances[-1])
 
         elif all_distances[-1][1] <= 300 and all_distances[-2][1] <= 300 \
                 and all_distances[-3][1] <= 300 and \
@@ -84,9 +87,10 @@ def mappning(current_distances):
                 print("\nENDPOINT CHECK")
                 print(endpoint)
 
-                if math.hypot(endpoint[1][0]-startpoint[1][0], endpoint[1][1]-startpoint[1][1]) < 500:
+                if math.hypot(endpoint[1][0]-startpoint[1][0], endpoint[1][1]-startpoint[1][1]) < 5:
                     # Check if the length is enough. If not, reset it
-                    endpoint = [0, ()]
+                    print(math.hypot(endpoint[1][0]-startpoint[1][0], endpoint[1][1]-startpoint[1][1]))
+		    endpoint = [0, ()]
                     print("\nENDPOINT SUCCESS")
                     print(endpoint)
 
@@ -102,17 +106,15 @@ def mappning(current_distances):
             offset = math.hypot(GPS_history[-1][0] - endpoint[1][0], GPS_history[-1][1] - endpoint[1][1])
             distance_to_car = all_distances[-1][1]  # Latest distance measured from rearwheel
 
-            if position_change < 5:
+            if position_change < 0.05:
                 talker(1)  # Index tells talker if the car is standing still or not
+                mapping_state = False
             else:
                 talker(0)  # Still moving
 
     # TODO:
-    # implement that it is only ok if parking_length > 5 meter
-    # now it is dependant on GPS signal, have not tested it outside where GPS works
-    # If statement for skipping first 5 values for the startpoint
-    # Reset startpoint when needed
-    # When 3 values are not ok, then 3 again
+    # Decide when to stop mapping script. Now True/false mapping_state
+    # Fix distances for the objects coordinates
 
     # Of the mapping variables, only the offset is to be updated after an endpoint is found
     # if endpoint != [0, ()]:
@@ -120,22 +122,26 @@ def mappning(current_distances):
 
 
 def controller():
-    while():
-        global endpoint
-        pub = rospy.Publisher('controls', car_control, queue_size=5)
-        rate = rospy.Rate(10)
+
+	global endpoint
+        pub_steering = rospy.Publisher('controls', car_control, queue_size=5)
+        rate = rospy.Rate(60)
         msg_to_publish = car_control()
+	#print("Controller")
 
         # msg_to_publish.speed = 1  # Commented these two lines
         # msg_to_publish.angle = 20
         # Drive forward 1 km/h until endpoint is found (i.e. done mapping, spot found)
         msg_to_publish.angle = 0
+	#msg_to_publish.speed = 1
         if endpoint != [0, ()]:
             msg_to_publish.speed = 0
-        elif endpoint == [0, ()]:
+	    print("\nSPEED 0")
+        else: # endpoint == [0, ()]:
+	    #print("Speed =1")
             msg_to_publish.speed = 1
 
-        pub.publish(msg_to_publish)
+        pub_steering.publish(msg_to_publish)
         rate.sleep()
 
 
@@ -144,18 +150,21 @@ def talker(standstill):
     global parking_length
     global offset
     global distance_to_car
+    print("\nIN TALKER")
 
-    pub = rospy.Publisher('mappning', Float64MultiArray, queue_size=2)
+    pub_mapping = rospy.Publisher('mappning', Float64MultiArray, queue_size=2)
+    rate_talker = rospy.Rate(60)
     while not rospy.is_shutdown():
+        print("IN PUBLISHER")
         mapping_variables.data = [parking_length, offset, distance_to_car, standstill]
         # print([parking_length, offset, distance_to_car])
-        pub.publish(mapping_variables)
+        pub_mapping.publish(mapping_variables)
+	rate.sleep()
         break  # I och med rospy.spin() behovs val inte while och break? Har utgatt fran gps_calc.
         # Andra aven dar i sa fall
 
 
 def listener():
-    rospy.init_node('mappning', anonymous=True)
     rospy.Subscriber('GPS_pos', Float64MultiArray, callback_gps)  # Changed here to actual gps topic
     rospy.Subscriber('ultrasonic', Float64MultiArray, callback_ultrasonicsensor)
     rospy.spin()
@@ -167,33 +176,6 @@ if __name__ == '__main__':
     pspot_distances = []
     startpoint = [0, ()]  # Changed both to None/[] (after changing from list to array)
     endpoint = [0, ()]
+    mapping_state = True
     rospy.init_node('mappning', anonymous=True)
     listener()
-
-    # 3 since 2.5m + 0.5m margin
-    #    if all_distances[len(all_distances)-1][0] > 3 and all_distances[len(all_distances)-2][0] > 3 \
-    #            and all_distances[len(all_distances)-3][0] > 3:
-    #        # Pair the sensordistances with a gps-position (imaginary) if large enough (empty parkingspot)
-    #        if all_distances[len(all_distances)-4][0] <= 3 and all_distances[len(all_distances)-5][0] <= 3 \
-    #                and all_distances[len(all_distances)-6][0] <= 3:
-    #            # If it is the first time, include the previous ok measurements (3 in a row)
-    #            pspot_distances.append([all_distances[len(all_distances)-3][0], GPS_history[len(GPS_history)-3][0]])
-    #            pspot_distances.append([all_distances[len(all_distances)-2][0], GPS_history[len(GPS_history)-2][0]])
-    #            startpoint.append([all_distances[len(all_distances)-3][0], GPS_history[len(GPS_history)-3][0]])
-    #            print(startpoint)
-    #        pspot_distances.append([all_distances[len(all_distances)-1][0], GPS_history[len(GPS_history)-1][0]])
-
-    #    elif all_distances[len(all_distances)-1][0] <= 3 and all_distances[len(all_distances)-2][0] <= 3\
-    #            and all_distances[len(all_distances)-3][0] <= 3 and \
-    #            all_distances[len(all_distances)-4][0] > 3 and all_distances[len(all_distances)-5][0] > 3 \
-    #            and all_distances[len(all_distances)-6][0] > 3:
-    #        endpoint.append([all_distances[len(all_distances)-4][0], GPS_history[len(GPS_history)-4][0]])
-    #        print(endpoint)
-
-    # The following part is copied from above, but counts backwards instead. all "len(GPS_history)" removed
-    # Should be exactly the same, but want to test it first
-    # [0] changed to [1] since index 1 is for rearwheel sensor, 0 behind
-    # Correct..?
-    # ALSO, GPS_history[len(GPS_history)-3][0]] --> GPS_history[-3]] Due to an array of x,y,angle
-    # Maybe exclude the angle later on?
-    # 3 since 2.5m + 0.5m margin

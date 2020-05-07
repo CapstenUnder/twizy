@@ -140,9 +140,9 @@ def path(current, goal, parkingmap):
                      
 
 def main():
-    offset = 1.5
-    parkingLength = 6.5
-    distance = 1.3
+    offset = 1
+    parkingLength = 5.5
+    distance = 1.8
     current = Coordinate(0, 0)
 
     goal = Coordinate(offset + parkingLength - 1.25, distance + 1.25)

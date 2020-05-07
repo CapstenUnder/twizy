@@ -20,7 +20,7 @@ class Wrapper:
         self.init_counter = 0
         self.backsensor_dist = None
         self.collision_warning = False
-	self.stop = False
+
     def shutdown_hook(self):
         print('Goal reached!')
 
@@ -28,21 +28,20 @@ class Wrapper:
     def ros_plot(self, states):
         plt.cla()
         plt.plot(path.cx, path.cy, ".r", label="course")
-        plt.plot(states.rear_x, states.rear_y, "-b", label="trajectory")
+        plt.plot(states.x, states.y, "-b", label="trajectory")
         plt.legend()
         plt.xlabel("x[m]")
         plt.ylabel("y[m]")
         plt.axis("equal")
         plt.grid(True)
-	plt.show()
 
 
     def GPS_callback(self, msg):
-        if self.init_counter < 1:			#initialize gps
+        if self.init_counter < 1:
             self.GPS_init_xpos = msg.data[0]
             self.init_counter += 1
         self.GPS = msg.data
-        if self.path_is_ready and self.stop == False:
+        if self.path_is_ready:
             print('yaw angle: ', self.GPS[2])
             target_speed = -1   # [m/s]
             # initial state
@@ -71,7 +70,7 @@ class Wrapper:
             pub.publish(msg_to_publish)
 
 
-          	# stops if:
+          	# stops if 
             dist_traveled_x = np.abs(msg.data[0] - self.GPS_init_xpos)
             if dist_traveled_x > self.offset + self.parking_length -2.5 or self.collision_warning:
                 print('Goal reached, shutting down')
@@ -79,21 +78,24 @@ class Wrapper:
                 msg_to_publish.speed = 0
                 print(angle,target_speed)
                 pub.publish(msg_to_publish)
-                self.ros_plot(states)
-                #rospy.on_shutdown(self.shutdown_hook())	
-		self.stop = True
-		exit()
+                #self.ros_plot(states)
+                #rospy.on_shutdown(self.shutdown_hook())
+		while 1:
+			self.ros_plot(states)
+			print("done")
 
 
-    def path_callback(self, msg):
+
+
+    def path_callback(self, msg):  # fix callback when mapping is done
         path.path_generated =  msg.data[3]
-        if path.is_path_generated() == 1 and self.counter < 1 and self.GPS != None:   #run once and only if gps signal is active
+        if path.is_path_generated() == 1 and self.counter < 1 and self.GPS != None:  
             a =  msg.data[0] # 0.8960
             b =  msg.data[1] # 0.6765
             c =  msg.data[2] # 0
             self.offset = msg.data[4]
             self.parking_length = msg.data[5]
-            path.set_path(a, b, c, self.GPS[0], self.GPS[1], self.GPS[2] + np.pi )	#generate path
+            path.set_path(a, b, c, self.GPS[0], self.GPS[1] + 0.8, self.GPS[2])     #0.3
             self.counter += 1
             self.path_is_ready = True
 

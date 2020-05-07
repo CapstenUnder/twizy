@@ -100,7 +100,7 @@ class TargetCourse:
         rear_y = gps_y - ((WB / 2) * math.sin(yaw))
 
         self.cx = np.arange(rear_x, rear_x + 20 - 1.25, 0.1)
-        self.cy = [rear_y + a * np.arctan((1/b)*((-rear_x) -3*b-c)) + a * np.arctan((1 / b) * ((x-rear_x) - 3 * b - c)) for x in self.cx]
+        self.cy = [rear_y + a * np.arctan((c/b + 3)) + a * np.arctan((1 / b) * ((x-rear_x) - 3 * b - c)) for x in self.cx]
         return self.cx, self.cy
 
 

@@ -84,7 +84,7 @@ def mapping(current_distances):
                 all_distances[-4][1] > 300 and all_distances[-5][1] > 300 \
                 and all_distances[-6][1] > 300:
 
-            if endpoint == [0, ()]:  # TEST: Changed [] to [0,()]
+            if endpoint == [0, ()] and startpoint != [0, ()]:  # TEST: Changed [] to [0,()]
 
                 # Check if there is an endpoint
                 endpoint = [all_distances[-4][1], GPS_history[-4]]  # Instead of a list, it is now a value
@@ -96,6 +96,7 @@ def mapping(current_distances):
 
                 if math.hypot(endpoint[1][0]-startpoint[1][0], endpoint[1][1]-startpoint[1][1]) < 5:
                     # Check if the length is enough. If not, reset it
+                    print(endpoint)
                     endpoint = [0, ()]
                     print("\nENDPOINT Failure")
                     print(endpoint)
@@ -122,6 +123,7 @@ def mapping(current_distances):
     # Decide when to stop mapping script. Now True/false mapping_state
     # Fix distances for the objects coordinates
     # Maybe change != [0, ()] to != if len(startpoint[1][0]) > 0
+    # 115200 as serial.begin(115200), upload it to the arduino
 
     # Of the mapping variables, only the offset is to be updated after an endpoint is found
     # if endpoint != [0, ()]:
@@ -131,6 +133,7 @@ def mapping(current_distances):
 def controller():
 
     global endpoint
+    global all_distances_with_gps
     pub_steering = rospy.Publisher('controls', car_control, queue_size=5)
     rate = rospy.Rate(60)
     msg_to_publish = car_control()
@@ -149,6 +152,14 @@ def controller():
         msg_to_publish.speed = 1
 
     pub_steering.publish(msg_to_publish)
+
+
+    pub_map = rospy.Publisher('map_data', Float64MultiArray, queue_size=2)
+    rate_talker = rospy.Rate(60)
+    # print([parking_length, offset, distance_to_car])
+    pub_map.publish(all_distances_with_gps)
+    rate_talker.sleep()
+
     rate.sleep()
 
 
@@ -157,7 +168,6 @@ def talker(standstill):
     global parking_length
     global offset
     global distance_to_car
-    global all_distances_with_gps
     print("\nIN TALKER")
 
     pub_mapping_var = rospy.Publisher('mapping_var', Float64MultiArray, queue_size=2)
@@ -165,12 +175,6 @@ def talker(standstill):
     mapping_variables.data = [parking_length, offset, distance_to_car, standstill]
     # print([parking_length, offset, distance_to_car])
     pub_mapping_var.publish(mapping_variables)
-    rate_talker.sleep()
-
-    pub_map = rospy.Publisher('map_data', Float64MultiArray, queue_size=2)
-    rate_talker = rospy.Rate(60)
-    # print([parking_length, offset, distance_to_car])
-    pub_map.publish(all_distances_with_gps)
     rate_talker.sleep()
 
     # I och med rospy.spin() behovs val inte while och break? Har utgatt fran gps_calc.

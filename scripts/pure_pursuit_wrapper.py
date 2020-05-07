@@ -21,6 +21,8 @@ class Wrapper:
         self.backsensor_dist = None
         self.collision_warning = False
 	self.stop = False
+	self.target_ind = None
+
     def shutdown_hook(self):
         print('Goal reached!')
 
@@ -28,7 +30,7 @@ class Wrapper:
     def ros_plot(self, states):
         plt.cla()
         plt.plot(path.cx, path.cy, ".r", label="course")
-        plt.plot(states.rear_x, states.rear_y, "-b", label="trajectory")
+        plt.plot(states.x, states.y, "-b", label="trajectory")
         plt.legend()
         plt.xlabel("x[m]")
         plt.ylabel("y[m]")
@@ -48,14 +50,13 @@ class Wrapper:
             # initial state
             state.update_from_gps(self.GPS, target_speed)  # yaw+3.14?
             lastIndex = len(path.cx) - 1
-            target_ind, _ = path.search_target_index(state)
 
             states.append(self.time, state)
             self.time += 1
             # Calc control input
             ai = pure_pursuit.proportional_control(target_speed, state.v)
-            di, target_ind = pure_pursuit.pure_pursuit_steer_control(
-                state, path, target_ind)
+            di, self.target_ind = pure_pursuit.pure_pursuit_steer_control(
+                state, path, self.target_ind)
 
 
             di = di*180/math.pi         # convert to degrees
@@ -73,7 +74,7 @@ class Wrapper:
 
           	# stops if:
             dist_traveled_x = np.abs(msg.data[0] - self.GPS_init_xpos)
-            if dist_traveled_x > self.offset + self.parking_length -2.5 or self.collision_warning:
+            if dist_traveled_x > self.offset + self.parking_length + 4  or self.collision_warning:
                 print('Goal reached, shutting down')
                 msg_to_publish.angle = 0
                 msg_to_publish.speed = 0
@@ -93,9 +94,12 @@ class Wrapper:
             c =  msg.data[2] # 0
             self.offset = msg.data[4]
             self.parking_length = msg.data[5]
-            path.set_path(a, b, c, self.GPS[0], self.GPS[1], self.GPS[2] + np.pi )	#generate path
+            path.set_path(a, b, c, self.GPS[0], self.GPS[1], self.GPS[2] + np.pi )	#generate path-------------------
             self.counter += 1
-            self.path_is_ready = True
+	    state.update_from_gps(self.GPS , -1)
+	    self.target_ind, _ = path.search_target_index(state)
+	    self.path_is_ready = True
+
 
     def ultrasonic_callback(self,msg):
 	if self.path_is_ready:
@@ -137,7 +141,6 @@ if __name__ == '__main__':
     wrap = Wrapper()
     state = pure_pursuit.State()
     states = pure_pursuit.States()
-
     open('distances.txt', 'w').close()
     dist_file = open("distances.txt", "a")
 

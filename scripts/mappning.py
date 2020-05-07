@@ -59,7 +59,7 @@ def mappning(current_distances):
     if len(all_distances) > 5 and mapping_state == True:  # Only check mapping after 5 values have been recorded
         #print("FIRST")
 	controller()  # Controls the speed during the mapping sequence. 0 if parkingspot found (endpoint)
-	print("post controller")
+	#print("post controller")
         if all_distances[-1][1] > 300 and all_distances[-2][1] > 300 \
                 and all_distances[-3][1] > 300:
             # Pair the sensordistances with a gps-position (imaginary) if large enough (empty parkingspot)
@@ -87,9 +87,10 @@ def mappning(current_distances):
                 print("\nENDPOINT CHECK")
                 print(endpoint)
 
-                if math.hypot(endpoint[1][0]-startpoint[1][0], endpoint[1][1]-startpoint[1][1]) < 500:
+                if math.hypot(endpoint[1][0]-startpoint[1][0], endpoint[1][1]-startpoint[1][1]) < 5:
                     # Check if the length is enough. If not, reset it
-                    endpoint = [0, ()]
+                    print(math.hypot(endpoint[1][0]-startpoint[1][0], endpoint[1][1]-startpoint[1][1]))
+		    endpoint = [0, ()]
                     print("\nENDPOINT SUCCESS")
                     print(endpoint)
 
@@ -105,7 +106,7 @@ def mappning(current_distances):
             offset = math.hypot(GPS_history[-1][0] - endpoint[1][0], GPS_history[-1][1] - endpoint[1][1])
             distance_to_car = all_distances[-1][1]  # Latest distance measured from rearwheel
 
-            if position_change < 5:
+            if position_change < 0.05:
                 talker(1)  # Index tells talker if the car is standing still or not
                 mapping_state = False
             else:
@@ -137,7 +138,7 @@ def controller():
             msg_to_publish.speed = 0
 	    print("\nSPEED 0")
         else: # endpoint == [0, ()]:
-	    print("Speed =1")
+	    #print("Speed =1")
             msg_to_publish.speed = 1
 
         pub_steering.publish(msg_to_publish)
@@ -152,11 +153,13 @@ def talker(standstill):
     print("\nIN TALKER")
 
     pub_mapping = rospy.Publisher('mappning', Float64MultiArray, queue_size=2)
+    rate_talker = rospy.Rate(60)
     while not rospy.is_shutdown():
         print("IN PUBLISHER")
         mapping_variables.data = [parking_length, offset, distance_to_car, standstill]
         # print([parking_length, offset, distance_to_car])
         pub_mapping.publish(mapping_variables)
+	rate.sleep()
         break  # I och med rospy.spin() behovs val inte while och break? Har utgatt fran gps_calc.
         # Andra aven dar i sa fall
 

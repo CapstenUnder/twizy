@@ -23,6 +23,8 @@ class Wrapper:
 	self.stop = False
 	self.target_ind = None
 
+
+
     def shutdown_hook(self):
         print('Goal reached!')
 
@@ -54,7 +56,7 @@ class Wrapper:
             states.append(self.time, state)
             self.time += 1
             # Calc control input
-            ai = pure_pursuit.proportional_control(target_speed, state.v)
+
             di, self.target_ind = pure_pursuit.pure_pursuit_steer_control(
                 state, path, self.target_ind)
 
@@ -72,6 +74,7 @@ class Wrapper:
             pub.publish(msg_to_publish)
 
 
+
           	# stops if:
             dist_traveled_x = np.abs(msg.data[0] - self.GPS_init_xpos)
             if dist_traveled_x > self.offset + self.parking_length + 4  or self.collision_warning:
@@ -81,7 +84,8 @@ class Wrapper:
                 print(angle,target_speed)
                 pub.publish(msg_to_publish)
                 self.ros_plot(states)
-                #rospy.on_shutdown(self.shutdown_hook())	
+                #rospy.on_shutdown(self.shutdown_hook())
+
 		self.stop = True
 		exit()
 

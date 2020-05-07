@@ -100,8 +100,8 @@ class TargetCourse:
         rear_y = gps_y - ((WB / 2) * math.sin(yaw))
 
         self.cx = np.arange(rear_x, rear_x + 20 - 1.25, 0.1)
-        self.cy = [2 for x in self.cx]
-	#self.cy = [rear_y + a * np.arctan((c/b + 3)) + a * np.arctan((1 / b) * ((x-rear_x) - 3 * b - c)) for x in self.cx]
+        #self.cy = [2 for x in self.cx]
+        self.cy = [rear_y + a * np.arctan((c/b + 3)) + a * np.arctan((1 / b) * ((x-rear_x) - 3 * b - c)) for x in self.cx]
         return self.cx, self.cy
 
 
@@ -179,16 +179,15 @@ def main():
     c = 0
     #  target course
     path = TargetCourse()
-    cx = np.arange(0, 10, 0.1)
-    offset = 1
-    parking_length = 5.5
+
+
     cx , cy = path.set_path(a, b, c, -6, -5, 3.14)
     target_speed = -5 / 3.6  # [m/s]
 
     T = 100.0  # max simulation time
 
     # initial state
-    state = State(x=-6, y=-5, yaw=3.14, v=0.0)
+    state = State(x=-6, y=-5, yaw=1.5, v=0.0)
 
     lastIndex = len(cx) - 1
     time = 0.0

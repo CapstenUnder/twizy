@@ -48,7 +48,7 @@ def talker():
         local_y = x * np.sin(angle_ref) + y * np.cos(angle_ref)
         local_angle = (angle + angle_ref - np.pi/2) % (2*np.pi)
 
-        msg_to_publish.data = [local_x, local_y, local_angle]
+        msg_to_publish.data = [local_x, local_y, local_angle] 
 	#msg_to_publish.data = [x, y, angle]
 	pub.publish(msg_to_publish)
 

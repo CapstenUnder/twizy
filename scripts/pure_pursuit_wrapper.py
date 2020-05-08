@@ -98,7 +98,7 @@ class Wrapper:
             c =  msg.data[2] # 0
             self.offset = msg.data[4]
             self.parking_length = msg.data[5]
-            path.set_path(a, b, c, self.GPS[0], self.GPS[1], self.GPS[2] + np.pi)	#generate path-------------------
+            path.set_path(a, b, c, self.GPS[0], self.GPS[1], self.GPS[2])	#generate path-------------------
             self.counter += 1
 	    state.update_from_gps(self.GPS , -1)
 	    self.target_ind, _ = path.search_target_index(state)

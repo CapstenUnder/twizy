@@ -7,7 +7,7 @@ matplotlib.use('TkAgg')
 
 # Parameters
 k = 0.1    # look forward gain
-Lfc = 0.8  # [m] look-ahead distance
+Lfc = 3  # [m] look-ahead distance
 Kp = 2     # speed proportional gain
 dt = 0.1   # [s] time tick
 WB = 1.686  # [m] wheel base of vehicle
@@ -28,7 +28,7 @@ class State:
     def update_from_gps(self, gps_data, v):
         self.x = gps_data[0]
         self.y = gps_data[1]
-        self.yaw = gps_data[2] + np.pi
+        self.yaw = -gps_data[2] + np.pi
         self.v = v
         self.rear_x = self.x - ((WB / 2) * math.cos(self.yaw))
         self.rear_y = self.y - ((WB / 2) * math.sin(self.yaw))

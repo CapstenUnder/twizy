@@ -46,7 +46,7 @@ def talker():
 
         local_x = x * np.cos(angle_ref) - y * np.sin(angle_ref)
         local_y = x * np.sin(angle_ref) + y * np.cos(angle_ref)
-        local_angle = (angle + angle_ref) % (2*np.pi)
+        local_angle = (angle + angle_ref - np.pi/2) % (2*np.pi)
 
         msg_to_publish.data = [local_x, local_y, local_angle]
 	#msg_to_publish.data = [x, y, angle]
@@ -63,7 +63,7 @@ def talker():
 	plt.pause(0.01)
 
 	"""
-	print([local_x, local_y, np.degrees(local_angle), np.degrees(angle), angle_ref])
+	print([local_x, local_y, np.degrees(local_angle)])
         #print([gps_v_x, gps_v_y, angle])
         break
 

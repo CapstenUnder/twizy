@@ -7,7 +7,7 @@ matplotlib.use('TkAgg')
 
 # Parameters
 k = 0.1    # look forward gain
-Lfc = 3  # [m] look-ahead distance
+Lfc = 1.5  # [m] look-ahead distance
 Kp = 2     # speed proportional gain
 dt = 0.1   # [s] time tick
 WB = 1.686  # [m] wheel base of vehicle
@@ -95,11 +95,11 @@ class TargetCourse:
 
         return gen
 
-    def set_path(self, a, b, c, gps_x, gps_y, yaw):
+    def set_path(self, a, b, c, gps_x, gps_y, yaw, offset, parking_length):
         rear_x = gps_x - ((WB / 2) * math.cos(yaw))
         rear_y = gps_y - ((WB / 2) * math.sin(yaw))
 
-        self.cx = np.arange(rear_x, rear_x + 20 - 1.25, 0.1)
+        self.cx = np.arange(rear_x, rear_x + 20 - 1, 0.1)
         #self.cy = [2 for x in self.cx]
         self.cy = [rear_y + a * np.arctan((c/b + 3)) + a * np.arctan((1 / b) * ((x-rear_x) - 3 * b - c)) for x in self.cx]
         return self.cx, self.cy

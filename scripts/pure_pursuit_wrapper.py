@@ -77,8 +77,9 @@ class Wrapper:
 
           	# stops if:
             dist_traveled_x = np.abs(msg.data[0] - self.GPS_init_xpos)
-            if dist_traveled_x > self.offset + self.parking_length + 4  or self.collision_warning:
-                print('Goal reached, shutting down')
+            if dist_traveled_x > self.offset + self.parking_length +3  or self.collision_warning:
+            #if self.target_ind > lastIndex:
+	        print('Goal reached, shutting down')
                 msg_to_publish.angle = 0
                 msg_to_publish.speed = 0
                 print(angle,target_speed)
@@ -98,7 +99,7 @@ class Wrapper:
             c =  msg.data[2] # 0
             self.offset = msg.data[4]
             self.parking_length = msg.data[5]
-            path.set_path(a, b, c, self.GPS[0], self.GPS[1], self.GPS[3])	#generate path-------------------
+            path.set_path(a, b, c, self.GPS[0], self.GPS[1], self.GPS[3], self.offset, self.parking_length)	#generate path-------------------
             self.counter += 1
 	    state.update_from_gps(self.GPS , -1)
 	    self.target_ind, _ = path.search_target_index(state)

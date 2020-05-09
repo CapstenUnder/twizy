@@ -42,11 +42,11 @@ class Wrapper:
 
 
     def GPS_callback(self, msg):
-        if self.init_counter < 1:			#initialize gps
-            self.GPS_init_xpos = msg.data[0]
-            self.init_counter += 1
         self.GPS = msg.data
         if self.path_is_ready and self.stop == False:
+	    if self.init_counter < 1:
+		self.GPS_init_xpos = msg.data[0]
+		self.init_counter += 1
             #print(self.GPS[0], self.GPS[1], np.degrees(self.GPS[3]))
             target_speed = -1   # [m/s]
             # initial state

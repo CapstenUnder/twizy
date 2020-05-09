@@ -98,7 +98,7 @@ def path(current, goal, parkingmap):
         for b in periodarray:
             for c in phasearray:
                 if a != 0 and b != 0:
-                    radius.clear()
+                    del radius[:]
                     collision1 = False
                     counter = 0
                     function = f_arctan(a, b, c, lengtharray)
@@ -133,7 +133,7 @@ def path(current, goal, parkingmap):
                     if collision1 == True:
                         break
 
-                    plt.plot(lengtharray, function)
+                    #plt.plot(lengtharray, function)
                     print([a, b, c])
                     return a, b, c
 

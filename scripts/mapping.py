@@ -71,7 +71,7 @@ def mapping(current_distances):
     # Example: detects the endpoint earlier than when the sensor is orthogonal to it, for a longer time for startpoint
 
     # A need to adjust the coordinate for start/endpoint is brought up. Trigonometry for the distance.
-    cone_angle = 15*(np.pi/180) / 2  # Radians (Divided by 2 due to sensor precision in wider area)
+    cone_angle = 15*(np.pi/180) #/ 2   Radians (Divided by 2 due to sensor precision in wider area)
     # adjusted_distance = np.cos(cone_angle)* the_measured_distance
     # OR: adjust requirement for parking_length
     # DECISION: Adjusting coordinates for startpoint and endpoint, does not affect other calculations
@@ -83,7 +83,7 @@ def mapping(current_distances):
     if len(all_distances) < 3:
         x_distance = current_distances.data[1]
         safety_distance = x_distance + 250  # For Assessing if the distance is enough to be a empty parkingspace
-        safety_distance -= 100  # Temporarily reduced
+        #safety_distance -= 100   Temporarily reduced
         print(x_distance)
         print("Safety distance:")
         print(safety_distance)
@@ -101,7 +101,8 @@ def mapping(current_distances):
                 print("\nSTARTPOINT")
                 startpoint = [all_distances[-3][1], GPS_history[-3]]  # Instead of a list, it is now a value
                 print(startpoint)
-                adjusted_startdistance = startpoint[1][0] + np.sin(cone_angle) * startpoint[0]/100
+                adjusted_startdistance = startpoint[1][0] + np.sin(cone_angle) * all_distances[-4][1]/100
+                # sin(angle) * (latest distance smaller than the safety distance)
                 startpoint = [startpoint[0], [adjusted_startdistance, startpoint[1][1], startpoint[1][2] ] ]
                 print(startpoint)
                 # Add the extra distance. Forward for the car is -x, therefore the +
@@ -127,7 +128,8 @@ def mapping(current_distances):
                     # Should only be one anyways
                     print("\nENDPOINT")
                     print(endpoint)
-                    adjusted_enddistance = endpoint[1][0] - np.sin(cone_angle) * endpoint[0]/100  # Scale distance to m from cm
+                    adjusted_enddistance = endpoint[1][0] - np.sin(cone_angle) * all_distances[-1][1] / 100
+                    # sin(angle) * (latest distance smaller than the safety distance). /100 due to cm --> m
                     endpoint = [endpoint[0], [adjusted_enddistance, endpoint[1][1], endpoint[1][2]]]
 
                     # Subtract the extra distance. Forward for the car is -x, therefore the -
@@ -137,7 +139,7 @@ def mapping(current_distances):
                     print("\nCheck if length is 5 or greater")
                     print(math.hypot(endpoint[1][0] - startpoint[1][0], endpoint[1][1] - startpoint[1][1]))
 
-                    if math.hypot(endpoint[1][0]-startpoint[1][0], endpoint[1][1]-startpoint[1][1]) < 2:
+                    if math.hypot(endpoint[1][0]-startpoint[1][0], endpoint[1][1]-startpoint[1][1]) < 5:
                         # Check if the length is enough. If not, reset it
                         # !!!
                         # CHANGED to 2 meter
@@ -161,8 +163,9 @@ def mapping(current_distances):
             print("BOTH endpoint and startpoint found")
             # Continue to update the offset & distance to car if both endpoint and startpoint are found
             parking_length = math.hypot(endpoint[1][0] - startpoint[1][0], endpoint[1][1] - startpoint[1][1])
-            offset = math.hypot(GPS_history[-1][0] - endpoint[1][0], GPS_history[-1][1] - endpoint[1][1])
-            distance_to_car = all_distances[-1][1]  # Latest distance measured from rearwheel
+            offset = math.hypot(GPS_history[-1][0] - endpoint[1][0], GPS_history[-1][1] - endpoint[1][1])  # Added 1 extra due to cone and testing!
+	    # !!! CHECK THE EXTRA OFFSET thingy
+            distance_to_car = all_distances[-1][1]/100  # Latest distance measured from rearwheel
             print(parking_length)
             print(offset)
             print(distance_to_car)
@@ -173,6 +176,8 @@ def mapping(current_distances):
                 mapping_state = False
                 #controller()
                 print("IN position change; standing still")
+		while(1):
+			talker_mapping_variables(1)
             else:
                 talker_mapping_variables(0)  # Still moving
                 print("Still moving")

@@ -77,7 +77,7 @@ class Wrapper:
 
           	# stops if:
             dist_traveled_x = np.abs(msg.data[0] - self.GPS_init_xpos)
-            if dist_traveled_x > self.offset + self.parking_length +3  or self.collision_warning:
+            if dist_traveled_x > self.offset + self.parking_length - 0.5  or self.collision_warning:
             #if self.target_ind > lastIndex:
 	        print('Goal reached, shutting down')
                 msg_to_publish.angle = 0

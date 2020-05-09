@@ -28,7 +28,7 @@ class State:
     def update_from_gps(self, gps_data, v):
         self.x = gps_data[0]
         self.y = gps_data[1]
-        self.yaw = gps_data[2]
+        self.yaw = gps_data[3]
         self.v = v
         self.rear_x = self.x - ((WB / 2) * math.cos(self.yaw))
         self.rear_y = self.y - ((WB / 2) * math.sin(self.yaw))
@@ -100,8 +100,8 @@ class TargetCourse:
         rear_y = gps_y - ((WB / 2) * math.sin(yaw))
 
         self.cx = np.arange(rear_x, rear_x + 20 - 1.25, 0.1)
-        self.cy = [2 for x in self.cx]
-        #self.cy = [rear_y + a * np.arctan((c/b + 3)) + a * np.arctan((1 / b) * ((x-rear_x) - 3 * b - c)) for x in self.cx]
+        #self.cy = [2 for x in self.cx]
+        self.cy = [rear_y + a * np.arctan((c/b + 3)) + a * np.arctan((1 / b) * ((x-rear_x) - 3 * b - c)) for x in self.cx]
         return self.cx, self.cy
 
 

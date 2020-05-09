@@ -47,7 +47,7 @@ class Wrapper:
             self.init_counter += 1
         self.GPS = msg.data
         if self.path_is_ready and self.stop == False:
-            print(self.GPS[0], self.GPS[1], np.degrees(self.GPS[2]))
+            #print(self.GPS[0], self.GPS[1], np.degrees(self.GPS[3]))
             target_speed = -1   # [m/s]
             # initial state
             state.update_from_gps(self.GPS, target_speed)  # yaw+3.14?
@@ -61,7 +61,7 @@ class Wrapper:
                 state, path, self.target_ind)
 
 
-            di = di*180/math.pi         # convert to degrees
+            di = -di*180/math.pi         # convert to degrees
             if di < -40:
                 angle = -40		# capping the steering angle at +-40 degrees
             elif di > 40:
@@ -70,7 +70,7 @@ class Wrapper:
                 angle = di
             msg_to_publish.angle = angle
             msg_to_publish.speed = target_speed
-            #print(angle,target_speed)
+            print(angle,target_speed)
             pub.publish(msg_to_publish)
 
 
@@ -98,7 +98,7 @@ class Wrapper:
             c =  msg.data[2] # 0
             self.offset = msg.data[4]
             self.parking_length = msg.data[5]
-            path.set_path(a, b, c, self.GPS[0], self.GPS[1], self.GPS[2])	#generate path-------------------
+            path.set_path(a, b, c, self.GPS[0], self.GPS[1], self.GPS[3])	#generate path-------------------
             self.counter += 1
 	    state.update_from_gps(self.GPS , -1)
 	    self.target_ind, _ = path.search_target_index(state)

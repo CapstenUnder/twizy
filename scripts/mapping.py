@@ -12,7 +12,7 @@ from std_msgs.msg import Float64MultiArray
 # from std_msgs.msg import Float32MultiArray  # Unsure if the gps_calc uses 32 or 64. Edit: NOT used
 from twizy.msg import car_control
 
-global GPS_history
+global GPS_history  # Probably horrible use of global variables, but I can't be asked anymore
 global all_distances
 global all_distances_with_gps
 global pspot_distances
@@ -165,7 +165,7 @@ def mapping(current_distances):
             parking_length = math.hypot(endpoint[1][0] - startpoint[1][0], endpoint[1][1] - startpoint[1][1])
             offset = math.hypot(GPS_history[-1][0] - endpoint[1][0], GPS_history[-1][1] - endpoint[1][1])  # Added 1 extra due to cone and testing!
 	    # !!! CHECK THE EXTRA OFFSET thingy
-            distance_to_car = all_distances[-1][1]/100  # Latest distance measured from rearwheel
+            distance_to_car = all_distances[-1][1]/100 + 1.23/2  # Latest distance measured from rearwheel + half car width
             print(parking_length)
             print(offset)
             print(distance_to_car)
@@ -273,5 +273,6 @@ if __name__ == '__main__':
     """
     rospy.init_node('mapping', anonymous=True)
     listener()
+
 
 

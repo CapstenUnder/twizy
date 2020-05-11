@@ -129,8 +129,9 @@ def mapping(current_distances):
                 print("Checking if startpoint and endpoint has been found")
                 print(startpoint)
                 print(endpoint)
-
-                if endpoint == [0, ()] and startpoint != [0, ()]:  # TEST: Changed [] to [0,()]
+                endpoint = [all_distances[-4][1], GPS_history[-4]]  # Instead of a list, it is now a value
+		# Changed above
+                if endpoint != [0, ()] and startpoint != [0, ()]:  # TEST: Changed [] to [0,()]
                     # Check if there is an endpoint
                     endpoint = [all_distances[-4][1], GPS_history[-4]]  # Instead of a list, it is now a value
                     # Should only be one anyways
@@ -194,7 +195,7 @@ def mapping(current_distances):
                 mapping_state = False
                 #controller()
                 print("IN position change; standing still")
-                with open('mapping_distances.txt', 'w+') as f:  # Write the important values to a textfile
+                with open('mapping_distances_twelveplottest.txt', 'w+') as f:  # Write the important values to a textfile
                     print("Creating mapping_distances.txt")
                     f.write(str(pspot_distances) + "\n")
                     f.write(str(object_distances) + "\n")
@@ -241,13 +242,13 @@ def talker_mapping_variables(standstill):
     global parking_length
     global offset
     global distance_to_car
-    print("\nIN TALKER")
+    #print("\nIN TALKER")
 
     pub_mapping_var = rospy.Publisher('mapping_var', Float64MultiArray, queue_size=2)
     # Error with type Float when publishing a list..?
     rate_talker = rospy.Rate(60)
     mapping_variables.data = [parking_length, offset, distance_to_car, standstill]
-    print(mapping_variables)
+    #print(mapping_variables)
     pub_mapping_var.publish(mapping_variables)
     rate_talker.sleep()
 

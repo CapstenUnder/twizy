@@ -133,16 +133,16 @@ def path(current, goal, parkingmap):
                     if collision1 == True:
                         break
 
-                    #plt.plot(lengtharray, function)
+                    plt.plot(lengtharray, function)
                     print([a, b, c])
                     return a, b, c
 
                      
 
 def main():
-    offset = 1
-    parkingLength = 5.5
-    distance = 1.8
+    offset = 1.5
+    parkingLength = 7
+    distance = 1
     current = Coordinate(0, 0)
 
     goal = Coordinate(offset + parkingLength - 1.25, distance + 1.25)

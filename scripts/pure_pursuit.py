@@ -26,8 +26,8 @@ class State:
         self.rear_y = self.y - ((WB / 2) * math.sin(self.yaw))
 
     def update_from_gps(self, gps_data, v):
-        self.x = gps_data[0]
-        self.y = gps_data[1]
+        self.x = gps_data[0] - 0.36 * math.cos(self.yaw)
+        self.y = gps_data[1] - 0.34 * math.sin(self.yaw)
         self.yaw = gps_data[3]
         self.v = v
         self.rear_x = self.x - ((WB / 2) * math.cos(self.yaw))

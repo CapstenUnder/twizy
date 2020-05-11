@@ -38,8 +38,14 @@ class Wrapper:
         plt.ylabel("y[m]")
         plt.axis("equal")
         plt.grid(True)
-	plt.show()
 
+	plt.subplots(1)
+	plt.plot(states.x, states.e, ".r", label="Crosstrack Error")
+	plt.xlabel("x[m]")
+	plt.ylabel("e[m]")
+	plt.grid(True)
+	plt.show()
+	
 
     def GPS_callback(self, msg):
         self.GPS = msg.data

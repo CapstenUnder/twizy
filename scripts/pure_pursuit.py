@@ -62,11 +62,14 @@ class States:
         self.rear_y = []
         self.v = []
         self.t = []
+	self.e= []
+
 
     def append(self, t, state):
         self.x.append(state.x)
         self.y.append(state.y)
         self.yaw.append(state.yaw)
+	self.e.append(np.sin(state.yaw)*Lfc)
         self.rear_x.append(state.rear_x)
         self.rear_y.append(state.rear_y)
         self.v.append(state.v)
@@ -128,7 +131,7 @@ class TargetCourse:
                 distance_this_index = distance_next_index
             self.old_nearest_point_index = ind
 
-        Lf = k * state.v + Lfc  # update look ahead distance
+        Lf = Lfc  # update look ahead distance, (+ k*state.v to make it proportional to speed)
 
         # search look ahead target point index
         while Lf > state.calc_distance(self.cx[ind], self.cy[ind]):

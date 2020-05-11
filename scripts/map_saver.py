@@ -60,7 +60,7 @@ def callback(data_ultrasonic):
         f.write(str(x) + "," + str(y) + "," + str(x_object) + "," + str(y_object) + "\n")
 
     # For plotting gps coordinates on xy-axles
-    """
+    
     size = 10
     plt.scatter(x_object, y_object, color="red", marker="x")
     plt.scatter(x, y, color="blue")
@@ -68,7 +68,7 @@ def callback(data_ultrasonic):
     plt.ion()
     plt.show()
     plt.pause(0.1)  # Changed to 1/60 (60hertz) from 0.01. It is seconds
-    """
+    
 
 
 def listener():

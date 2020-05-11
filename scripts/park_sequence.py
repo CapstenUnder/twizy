@@ -45,13 +45,13 @@ def talker2():
 
 	while not rospy.is_shutdown():
 		angle = 0
-		speed = -2 # km/h?
+		speed = -1 # km/h?
 		# initiera timer
 		t1 = time.time()
 		tdiff = t1 - t0
 		time_turn1 = langdcirkel1/(speed/3.6)*-1
 		time_turn1 += 1.5  # Added a delay of the "stigtid"
-		time_turn2 = langdcirkel2/(speed/3.6)*-1
+		time_turn2 = langdcirkel2/(speed/3.6)*-1 + 1.5
 		# if-satser for olika vinklar och olika tider
 		if tdiff < time_turn1:
 			angle = 40

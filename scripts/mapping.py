@@ -11,11 +11,13 @@ from std_msgs.msg import String
 from std_msgs.msg import Float64MultiArray
 # from std_msgs.msg import Float32MultiArray  # Unsure if the gps_calc uses 32 or 64. Edit: NOT used
 from twizy.msg import car_control
+import time
 
 global GPS_history  # Probably horrible use of global variables, but I can't be asked anymore
 global all_distances
 global all_distances_with_gps
 global pspot_distances
+global object_distances
 global startpoint
 global endpoint
 global parking_length
@@ -30,6 +32,7 @@ GPS_history = []
 all_distances = []
 all_distances_with_gps = []
 pspot_distances = []
+object_distances = []
 startpoint = [0, ()]  # Changed both to None/[] (after changing from list to array)
 endpoint = [0, ()]
 x_distance = 0
@@ -45,7 +48,11 @@ def callback_ultrasonicsensor(data):
 
 def callback_gps(data):
     # rospy.loginfo(rospy.get_caller_id() + 'i heard %s', data.data)
-    GPS_history.append(data.data)  # stores: [local_x, local_y, local_angle]
+    #GPS_history.append(data.data)  # stores: [local_x, local_y, local_angle]
+    # NEW: tuple unpacking
+    local_x, local_y, local_angle, zero_one = data.data
+    temp_GPS_history = [local_x, local_y, local_angle]
+    GPS_history.append(temp_GPS_history)  # stores: [local_x, local_y, local_angle]
 
 
 def mapping(current_distances):
@@ -114,6 +121,7 @@ def mapping(current_distances):
 
         elif all_distances[-1][1] <= safety_distance and all_distances[-2][1] <= safety_distance \
                 and all_distances[-3][1] <= safety_distance:
+	    print("first test")
 
             if all_distances[-4][1] > safety_distance and all_distances[-5][1] > safety_distance \
                 and all_distances[-6][1] > safety_distance:
@@ -147,41 +155,56 @@ def mapping(current_distances):
                         print(endpoint)
                         endpoint = [0, ()]
                         startpoint = [0, ()]  # Reset startpoint due to the failure
+                        del pspot_distances[:]  # Clear approved distances if fail
                         print("\nENDPOINT Failure")
                         print(endpoint)
             elif all_distances[-4][1] < safety_distance and all_distances[-5][1] < safety_distance \
-                and all_distances[-6][1] < safety_distance:
+                and all_distances[-6][1] < safety_distance and all_distances[-7][1] < safety_distance and all_distances[-8][1] < safety_distance and all_distances[-9][1] < safety_distance:
+		# Added three and statements
                 startpoint = [0, ()]  # Reset startpoint if there is an approved object
                 print("APPROVED OBJECT, resetting startpoint!")
+                object_distances.append([all_distances[-4][1], GPS_history[-4]])  # Approved object, append to list
+                object_distances.append([all_distances[-5][1], GPS_history[-6]])
+                object_distances.append([all_distances[-6][1], GPS_history[-6]])
+
 
         # pythagoras of deltax and deltay first[1] for gps, second [0] or [1] for x or y coordinate
         # Only append one endpoint, overwrites the old endpoint
 
-        position_change = math.hypot(GPS_history[-10][0] - GPS_history[-1][0], GPS_history[-10][1] - GPS_history[-1][1])
         # !! GPS coordinates unit is meter.
         if endpoint != [0, ()] and startpoint != [0, ()]:
             print("BOTH endpoint and startpoint found")
             # Continue to update the offset & distance to car if both endpoint and startpoint are found
             parking_length = math.hypot(endpoint[1][0] - startpoint[1][0], endpoint[1][1] - startpoint[1][1])
-            offset = math.hypot(GPS_history[-1][0] - endpoint[1][0], GPS_history[-1][1] - endpoint[1][1])  # Added 1 extra due to cone and testing!
-	    # !!! CHECK THE EXTRA OFFSET thingy
-            distance_to_car = all_distances[-1][1]/100 + 1.23/2  # Latest distance measured from rearwheel + half car width
+            offset = math.hypot(GPS_history[-1][0] - endpoint[1][0], GPS_history[-1][1] - endpoint[1][1])
+
+    	    # !!! CHECK THE EXTRA OFFSET thingy
+            distance_to_car = all_distances[-1][1]/100  # Latest distance measured from rearwheel
             print(parking_length)
             print(offset)
             print(distance_to_car)
-            controller()
+            position_change = math.hypot(GPS_history[-10][0] - GPS_history[-1][0], GPS_history[-10][1] - GPS_history[-1][1])
+            while(1):  # Delay to get a better/larger offset with speed = 1km/h
+                time.sleep(1)  # 1/3.6 meter
+                break
 
+            controller()
             if position_change < 0.05:
                 talker_mapping_variables(1)  # Index tells talker if the car is standing still or not. 1 = True
                 mapping_state = False
                 #controller()
                 print("IN position change; standing still")
-		while(1):
-			talker_mapping_variables(1)
+                with open('mapping_distances.txt', 'w+') as f:  # Write the important values to a textfile
+                    print("Creating mapping_distances.txt")
+                    f.write(str(pspot_distances) + "\n")
+                    f.write(str(object_distances) + "\n")
+                    f.write(str(startpoint) + "\n")
+                    f.write(str(endpoint) + "\n")
+                while(1):
+			        talker_mapping_variables(1)  # Loop to
             else:
                 talker_mapping_variables(0)  # Still moving
                 print("Still moving")
-
 
     # TODO:
     # Decide when to stop mapping script. Now True/false mapping_state
@@ -197,7 +220,7 @@ def mapping(current_distances):
 def controller():
     global endpoint
     pub_steering = rospy.Publisher('controls', car_control, queue_size=5)
-    rate = rospy.Rate(5)
+    rate = rospy.Rate(60)
     msg_to_publish = car_control()
 
     # Drive forward 1 km/h until endpoint is found (i.e. done mapping, spot found)
@@ -210,16 +233,6 @@ def controller():
         msg_to_publish.speed = 1
 
     pub_steering.publish(msg_to_publish)
-
-
-    #global all_distances_with_gps
-    # Commented for now. Error with type Float when publishing a list..?
-    #pub_map = rospy.Publisher('map_data', Float64MultiArray, queue_size=2)
-    #rate_talker = rospy.Rate(60)
-    # print([parking_length, offset, distance_to_car])
-    #pub_map.publish(all_distances_with_gps)  # A list, not a multiarray!
-    #rate_talker.sleep()
-
     rate.sleep()
 
 
@@ -232,26 +245,11 @@ def talker_mapping_variables(standstill):
 
     pub_mapping_var = rospy.Publisher('mapping_var', Float64MultiArray, queue_size=2)
     # Error with type Float when publishing a list..?
-    rate_talker = rospy.Rate(5)
+    rate_talker = rospy.Rate(60)
     mapping_variables.data = [parking_length, offset, distance_to_car, standstill]
     print(mapping_variables)
     pub_mapping_var.publish(mapping_variables)
     rate_talker.sleep()
-
-    # I och med rospy.spin() behovs val inte while och break? Har utgatt fran gps_calc.
-    # Andra aven dar i sa fall
-
-"""
-def publish_all_distances_with_gps(distances):
-
-    pub_distances = rospy.Publisher('distances_with_gps', Float64MultiArray, queue_size=2)
-    # Error with type Float when publishing a list..?
-    rate_talker = rospy.Rate(60)
-    #distances.data = [distances]
-    # print([parking_length, offset, distance_to_car])
-    pub_distances.publish(distances)
-    rate_talker.sleep()
-"""
 
 def listener():
     rospy.Subscriber('GPS_pos', Float64MultiArray, callback_gps)  # Changed here to actual gps topic
@@ -260,19 +258,6 @@ def listener():
 
 
 if __name__ == '__main__':
-    # Moved the below to the beginning of the script
-    """
-    GPS_history = []
-    all_distances = []
-    all_distances_with_gps = []
-    pspot_distances = []
-    startpoint = [0, ()]  # Changed both to None/[] (after changing from list to array)
-    endpoint = [0, ()]
-    x_distance = 0
-    mapping_state = True
-    """
     rospy.init_node('mapping', anonymous=True)
     listener()
-
-
 

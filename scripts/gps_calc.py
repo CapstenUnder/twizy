@@ -111,7 +111,8 @@ def listener():
 
     rospy.Subscriber('GPS_left', String, callback_v, queue_size=1)
     rospy.Subscriber('GPS_right', String, callback_h, queue_size=1)
-
+    rate = rospy.Rate(5)
+    rate.sleep()
     rospy.spin()
 
 

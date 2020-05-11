@@ -53,7 +53,7 @@ class Wrapper:
 	    if self.init_counter < 1:
 		self.GPS_init_xpos = msg.data[0]
 		self.init_counter += 1
-            #print(self.GPS[0], self.GPS[1], np.degrees(self.GPS[3]))
+            print(self.GPS[0], self.GPS[1], np.degrees(self.GPS[3]))
             target_speed = -1   # [m/s]
             # initial state
             state.update_from_gps(self.GPS, target_speed)  # yaw+3.14?
@@ -158,6 +158,6 @@ if __name__ == '__main__':
     while not rospy.is_shutdown():
         rospy.Subscriber('GPS_pos', Float64MultiArray, wrap.GPS_callback)		# x_pos, y_pos, heading_angle
         rospy.Subscriber('path_planner', Float64MultiArray, wrap.path_callback)		# a, b, c, Boolean_done, offset, parking_length 
-        rospy.Subscriber('ultrasonic', Float64MultiArray, wrap.ultrasonic_callback)	# back_sensor, side_sensor_back, side_sensor_front
-	wrap.emergency_break()
+        #rospy.Subscriber('ultrasonic', Float64MultiArray, wrap.ultrasonic_callback)	# back_sensor, side_sensor_back, side_sensor_front
+	#wrap.emergency_break()
         rate.sleep()

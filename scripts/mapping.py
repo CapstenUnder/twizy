@@ -197,7 +197,7 @@ def mapping(current_distances):
 def controller():
     global endpoint
     pub_steering = rospy.Publisher('controls', car_control, queue_size=5)
-    rate = rospy.Rate(60)
+    rate = rospy.Rate(5)
     msg_to_publish = car_control()
 
     # Drive forward 1 km/h until endpoint is found (i.e. done mapping, spot found)
@@ -232,7 +232,7 @@ def talker_mapping_variables(standstill):
 
     pub_mapping_var = rospy.Publisher('mapping_var', Float64MultiArray, queue_size=2)
     # Error with type Float when publishing a list..?
-    rate_talker = rospy.Rate(60)
+    rate_talker = rospy.Rate(5)
     mapping_variables.data = [parking_length, offset, distance_to_car, standstill]
     print(mapping_variables)
     pub_mapping_var.publish(mapping_variables)

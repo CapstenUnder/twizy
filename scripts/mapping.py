@@ -12,7 +12,7 @@ from std_msgs.msg import Float64MultiArray
 # from std_msgs.msg import Float32MultiArray  # Unsure if the gps_calc uses 32 or 64. Edit: NOT used
 from twizy.msg import car_control
 
-global GPS_history
+global GPS_history  # Probably horrible use of global variables, but I can't be asked anymore
 global all_distances
 global all_distances_with_gps
 global pspot_distances
@@ -273,5 +273,6 @@ if __name__ == '__main__':
     """
     rospy.init_node('mapping', anonymous=True)
     listener()
+
 
 

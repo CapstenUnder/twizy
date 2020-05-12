@@ -86,7 +86,7 @@ class Wrapper:
 	    if self.init_counter < 1:
 		self.GPS_init_xpos = msg.data[0]
 		self.init_counter += 1
-            print(self.GPS[0], self.GPS[1], np.degrees(self.GPS[3]))
+            #print(self.GPS[0], self.GPS[1], np.degrees(self.GPS[3]))
             target_speed = -1   # [m/s]
             # initial state
             state.update_from_gps(self.GPS, target_speed)  # yaw+3.14?
@@ -109,7 +109,7 @@ class Wrapper:
                 angle = di
             msg_to_publish.angle = angle
             msg_to_publish.speed = target_speed
-            print(angle,target_speed)
+            #print(angle,target_speed)
             pub.publish(msg_to_publish)
 
 
@@ -124,8 +124,10 @@ class Wrapper:
                 print(angle,target_speed)
                 pub.publish(msg_to_publish)
                 self.ros_plot(states)
+		plt.subplots(2)
                 plt.plot(list(self.parking_length.keys()), list(self.parking_map.values()), 'black')
-
+		plt.grid(True)
+		plt.show()
         #rospy.on_shutdown(self.shutdown_hook())
 
 		self.stop = True
@@ -148,9 +150,9 @@ class Wrapper:
         #parameters for parking map
             start = 0
             p1 = self.offset + self.GPS[0]
-            p2 = p1 + self.parking_ength
+            p2 = p1 + self.parking_length
             end = p2 + 3
-            self.parking_map = Map(start, p1, p2, end, self.distance, self.offset, self.GPS[1]).generateMap()
+            self.parking_map = Map(start, p1, p2, end, 1.5, self.offset, self.GPS[1]).generateMap()
 
             self.path_is_ready = True
 
@@ -203,4 +205,4 @@ if __name__ == '__main__':
         rospy.Subscriber('path_planner', Float64MultiArray, wrap.path_callback)		# a, b, c, Boolean_done, offset, parking_length 
         #rospy.Subscriber('ultrasonic', Float64MultiArray, wrap.ultrasonic_callback)	# back_sensor, side_sensor_back, side_sensor_front
 	#wrap.emergency_break()
-        rate.sleep()
+        #rate.sleep()

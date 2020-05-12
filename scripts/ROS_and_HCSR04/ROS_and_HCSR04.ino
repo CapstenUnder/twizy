@@ -7,6 +7,9 @@ std_msgs::Float64MultiArray Distance;
 
 ros::Publisher ultrasonic("ultrasonic",&Distance);
 
+// Observe the location of the file. When running, the file in rosserial is used
+// Also, new files need to be uploaded to the actual arduino board
+
 // defines pins numbers
 const int trigPin1 = 8;
 const int echoPin1 = 9;

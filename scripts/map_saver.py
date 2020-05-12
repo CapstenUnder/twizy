@@ -38,7 +38,7 @@ def callback_gps(data_gps):
 def callback(data_ultrasonic):
     if file_name == 'null':
         return
-    global x, y, y_object,x_object, GPS_history, dist_rearwheel
+    global x, y, y_object, x_object, GPS_history, dist_rearwheel
     print(data_ultrasonic.data)
     dist_behind, dist_rearwheel, dist_frontwheel = data_ultrasonic.data
     dist_rearwheel = float(dist_rearwheel)  # Rearwheel sensor in cm
@@ -51,24 +51,24 @@ def callback(data_ultrasonic):
     angle = float(GPS_history[2])
     print(dist_rearwheel)
     extra_angle = -90
-    y_object = float(y + dist_rearwheel / 100 * np.cos(angle) - dist_gps_sensor_x / 100 * np.sin(angle))  # Convert to meter from cm + distance / 100 * np.cos(angle)
-    x_object = float(x - dist_gps_sensor_x / 100 * np.sin(angle) + dist_rearwheel / 100 * np.cos(angle))
+    y_object = float(y + dist_rearwheel / 100 * np.cos(angle) - dist_gps_sensor_x / 100 * np.sin(angle))  
+    # Convert to meter from cm + distance / 100 * np.cos(angle)
+    x_object = float(x - dist_gps_sensor_x / 100 * np.cos(angle) + dist_rearwheel / 100 * np.sin(angle))
     # Rotate object according to the car. Orthogonal to car's right side.
-
 
     with open(file_name, 'a') as f:
         f.write(str(x) + "," + str(y) + "," + str(x_object) + "," + str(y_object) + "\n")
 
     # For plotting gps coordinates on xy-axles
-    
+
     size = 10
     plt.scatter(x_object, y_object, color="red", marker="x")
     plt.scatter(x, y, color="blue")
-    plt.axis([2*-size, size, -size, size])
+    plt.axis([2 * -size, size, -size, size])
     plt.ion()
     plt.show()
     plt.pause(0.01)  # Changed to 1/60 (60hertz) from 0.01. It is seconds
-    
+
 
 def listener():
     rospy.init_node('map_saver', anonymous=True)

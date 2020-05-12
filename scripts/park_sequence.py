@@ -34,10 +34,10 @@ langdcirkel2 = beta*(radie2+(bredd/2)) # obs theta ar fel
 
 # main loop, creates node and publishes the speed and angle to "controls"
 def talker2():
-	pub = rospy.Publisher('controls', car_control, queue_size=5) # Car_control??
+	pub = rospy.Publisher('controls', car_control, queue_size=1) # Car_control??
 	# pub = rospy.Publisher('controls', Float64MultiArray, queue_size=5)
 	rospy.init_node('talker2', anonymous=True)
-	rate = rospy.Rate(10) # 10hz
+	rate = rospy.Rate(60) # 10hz
 	# initializes the custom message and makes sure the starting values are 0
 	msg = car_control() #  Tror att vi kor pa Float62 istallet
 	# msg = Float64MultiArray

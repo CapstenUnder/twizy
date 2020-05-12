@@ -8,9 +8,9 @@ a = Float64MultiArray()
 
 
 def talker():
-    pub = rospy.Publisher('GPS_pos', Float64MultiArray, queue_size=10)
+    pub = rospy.Publisher('GPS_pos', Float64MultiArray, queue_size=1)
     rospy.init_node('testGPS', anonymous=True)
-    rate = rospy.Rate(1) # 10hz
+    rate = rospy.Rate(60) # 10hz
     counter=0
 
     while not rospy.is_shutdown():
@@ -21,8 +21,9 @@ def talker():
         b=counter
         c=2
         d=2
+	e=0
 
-	a.data=[b, c, d]
+	a.data=[b, c, d, e]
 
 if __name__ == '__main__':
     try:

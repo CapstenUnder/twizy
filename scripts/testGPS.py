@@ -10,7 +10,7 @@ a = Float64MultiArray()
 def talker():
     pub = rospy.Publisher('GPS_pos', Float64MultiArray, queue_size=1)
     rospy.init_node('testGPS', anonymous=True)
-    rate = rospy.Rate(60) # 10hz
+    rate = rospy.Rate(10) # 10hz
     counter=0
 
     while not rospy.is_shutdown():
@@ -30,3 +30,5 @@ if __name__ == '__main__':
         talker()
     except rospy.ROSInterruptException:
         pass
+
+

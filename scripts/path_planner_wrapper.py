@@ -16,7 +16,7 @@ class Wrapper:
             parking_length = msg.data[0]
             distance = msg.data[2]
             current = path_planner.Coordinate(0, 0)
-            goal = path_planner.Coordinate(offset + parking_length - 1.25, distance + 1.25)
+            goal = path_planner.Coordinate(offset + parking_length - 1, distance + 1)
 
             start = 0
             p1 = offset
@@ -45,8 +45,8 @@ if __name__ == '__main__':
     rate = rospy.Rate(1)  # Adjust rate?
     wrap = Wrapper()
     while not rospy.is_shutdown():
-        #rospy.Subscriber('mapping_var', Float64MultiArray, wrap.mapper_callback)
-        msg_to_publish.data = [1.1679, 0.9473,0.0,1, 1, 6]
-        print(msg_to_publish.data[0], msg_to_publish.data[1], msg_to_publish.data[2], msg_to_publish.data[3], msg_to_publish.data[4], msg_to_publish.data[5])
-        pub.publish(msg_to_publish)
+        rospy.Subscriber('mapping_var', Float64MultiArray, wrap.mapper_callback)
+        #msg_to_publish.data = [1.1679, 0.9473,0.0,1, 1, 6]
+        #print(msg_to_publish.data[0], msg_to_publish.data[1], msg_to_publish.data[2], msg_to_publish.data[3], msg_to_publish.data[4], msg_to_publish.data[5])
+        #pub.publish(msg_to_publish)
         rate.sleep()

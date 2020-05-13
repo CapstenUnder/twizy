@@ -196,7 +196,7 @@ def mapping(current_distances):
                 talker_mapping_variables(1)  # Index tells talker if the car is standing still or not. 1 = True
                 mapping_state = False
                 print("IN position change; standing still")
-                with open('mapping6magainlast.txt', 'w+') as f:  # Write the important values to a textfile
+                with open('mapping550magain1.txt', 'w+') as f:  # Write the important values to a textfile
                     print("Creating mapping_distances.txt")
                     f.write(str(pspot_distances) + "\n")
                     f.write(str(object_distances) + "\n")
@@ -262,4 +262,5 @@ def listener():
 if __name__ == '__main__':
     rospy.init_node('mapping', anonymous=True)
     listener()
+
 

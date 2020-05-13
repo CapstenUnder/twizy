@@ -7,6 +7,21 @@ from matplotlib import pyplot as plt
 import numpy as np
 import math
 
+file_name = "garbage.txt"
+
+def new_file():
+    global file_name
+    new_file_name = raw_input("Enter new file name including .txt: ")
+    print(new_file_name)
+    file_name = new_file_name
+
+def write_pos(x, y):
+    global file_name
+    print(file_name, x ,y)
+    with open(file_name, 'a') as f:
+        f.write(str(x) + "," + str(y) + "\n")
+
+
 class Map:
     def __init__(self,coordstart, coordbreak1, coordbreak2, coordend, twizydist, offset, GPS_y):
         self.coordstart = coordstart
@@ -93,6 +108,7 @@ class Wrapper:
             lastIndex = len(path.cx) - 1
 
             states.append(self.time, state)
+            write_pos(state.rear_x, state.rear_y)
             self.time += 1
             # Calc control input
 
@@ -186,7 +202,7 @@ class Wrapper:
 
 	   
 if __name__ == '__main__':
-
+    new_file()
     rospy.init_node('pure_pursuit')
     pub = rospy.Publisher('controls', car_control, queue_size=5)
 
@@ -205,4 +221,4 @@ if __name__ == '__main__':
         rospy.Subscriber('path_planner', Float64MultiArray, wrap.path_callback)		# a, b, c, Boolean_done, offset, parking_length 
         #rospy.Subscriber('ultrasonic', Float64MultiArray, wrap.ultrasonic_callback)	# back_sensor, side_sensor_back, side_sensor_front
 	#wrap.emergency_break()
-        #rate.sleep()
+        rate.sleep()

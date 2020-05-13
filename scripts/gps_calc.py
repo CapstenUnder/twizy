@@ -63,7 +63,7 @@ def talker():
 	plt.pause(0.01)
 
 	"""
-	print([local_x, local_y, np.degrees(local_angle), np.degrees(local_angle_180)])
+	print([local_x, local_y, np.degrees(local_angle)])
         #print([gps_v_x, gps_v_y, angle])
         break
 

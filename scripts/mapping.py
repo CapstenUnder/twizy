@@ -27,6 +27,7 @@ mapping_variables = Float64MultiArray()
 distances = Float64MultiArray()
 global mapping_state
 global safety_distance
+global fail_pspot
 
 GPS_history = []
 all_distances = []
@@ -37,7 +38,7 @@ startpoint = [0, ()]  # Changed both to None/[] (after changing from list to arr
 endpoint = [0, ()]
 x_distance = 0
 mapping_state = True
-
+fail_pspot = []
 
 def callback_ultrasonicsensor(data):
     # rospy.loginfo(rospy.get_caller_id() + 'i heard %s', data.data)
@@ -68,6 +69,7 @@ def mapping(current_distances):
     global mapping_state
     global x_distance
     global safety_distance
+    global fail_pspot
 
     # Adjustments to measure distance from GPS-unit to the object (not sensor to object)
     # distance_gps_rearwheelsensor = XX
@@ -160,6 +162,11 @@ def mapping(current_distances):
                         print(endpoint)
                         endpoint = [0, ()]
                         startpoint = [0, ()]  # Reset startpoint due to the failure
+                        #fail_pspot = pspot_distances
+			
+                        for element in pspot_distances:
+                            fail_pspot.append(element)
+
                         del pspot_distances[:]  # Clear approved distances if fail
                         print("\nENDPOINT Failure")
                         print(endpoint)
@@ -196,12 +203,14 @@ def mapping(current_distances):
                 talker_mapping_variables(1)  # Index tells talker if the car is standing still or not. 1 = True
                 mapping_state = False
                 print("IN position change; standing still")
-                with open('fulltestcomplete5.txt', 'w+') as f:  # Write the important values to a textfile
+                with open('fulltestlocalisation_two.txt', 'w+') as f:  # Write the important values to a textfile
                     print("Creating mapping_distances.txt")
                     f.write(str(pspot_distances) + "\n")
                     f.write(str(object_distances) + "\n")
                     f.write(str(startpoint) + "\n")
                     f.write(str(endpoint) + "\n")
+                    f.write(str(fail_pspot) + "\n")
+
                 while(1):
 			        talker_mapping_variables(1)  # Keep looping since mapping is done
             else:
@@ -262,4 +271,5 @@ def listener():
 if __name__ == '__main__':
     rospy.init_node('mapping', anonymous=True)
     listener()
+
 

@@ -152,7 +152,7 @@ def mapping(current_distances):
                     print("\nCheck if length is 5 or greater")
                     print(math.hypot(endpoint[1][0] - startpoint[1][0], endpoint[1][1] - startpoint[1][1]))
 
-                    if math.hypot(endpoint[1][0]-startpoint[1][0], endpoint[1][1]-startpoint[1][1]) < 5:
+                    if math.hypot(endpoint[1][0]-startpoint[1][0], endpoint[1][1]-startpoint[1][1]) < 4:
                         # Check if the length is enough. If not, reset it
                         # !!!
                         # CHANGED to 2 meter
@@ -196,7 +196,7 @@ def mapping(current_distances):
                 talker_mapping_variables(1)  # Index tells talker if the car is standing still or not. 1 = True
                 mapping_state = False
                 print("IN position change; standing still")
-                with open('mapping6magainlast.txt', 'w+') as f:  # Write the important values to a textfile
+                with open('fulltestcomplete5.txt', 'w+') as f:  # Write the important values to a textfile
                     print("Creating mapping_distances.txt")
                     f.write(str(pspot_distances) + "\n")
                     f.write(str(object_distances) + "\n")

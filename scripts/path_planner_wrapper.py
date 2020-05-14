@@ -14,7 +14,7 @@ class Wrapper:
         if msg.data[3]:
             offset = msg.data[1]
             parking_length = msg.data[0]
-            distance = msg.data[2]
+            distance = msg.data[2] + 0.41
             current = path_planner.Coordinate(0, 0)
             goal = path_planner.Coordinate(offset + parking_length - 1, distance + 1)
 
